@@ -4,6 +4,7 @@
 #include "QVBoxLayout"
 #include "serialbus/connectdialog.h"
 #include <QCanBus>
+#include <QCanBusFrame>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -108,6 +109,9 @@ void MainWindow::disconnectDevice()
 
 void MainWindow::sendButtonClicked(IGTableFrame *frame)
 {
-    qDebug()<<"Just in case";
-    frame->print();
+    //frame->print();
+    QCanBusFrame * canFrame;
+    canFrame = new QCanBusFrame(frame->getIdentifier(), *frame->getData());
+    m_canDevice->writeFrame(*canFrame);
+    delete canFrame;
 }

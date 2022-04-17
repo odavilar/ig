@@ -11,6 +11,8 @@ public:
     explicit IGTableFrame(qint32 identifier, bool periodic, float cycle, const QByteArray &data, QObject *parent = nullptr);
     //~IGTableFrame();
     void print();
+    quint32 getIdentifier();
+    QByteArray * getData();
 
 private:
     quint32 m_identifier = 0;

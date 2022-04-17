@@ -9,6 +9,20 @@
 #include <QComboBox>
 #include "igtableframe.h"
 
+class HexIntegerValidator : public QValidator
+{
+    Q_OBJECT
+public:
+    explicit HexIntegerValidator(QObject *parent = nullptr);
+
+    QValidator::State validate(QString &input, int &) const;
+
+    void setMaximum(uint maximum);
+
+private:
+    uint m_maximum = 0;
+};
+
 class IGTable : public QTableWidget
 {
     Q_OBJECT
@@ -29,6 +43,10 @@ public slots:
     void deleteButtonClicked();
     void sendClicked();
 
+private:
+    HexIntegerValidator *m_hexIntegerValidator = nullptr;
+
 };
+
 
 #endif // IGTABLE_H

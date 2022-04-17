@@ -1,9 +1,46 @@
 #include "igtable.h"
 #include <deletemsgbutton.h>
 
+enum {
+    MaxStandardId = 0x7FF,
+    MaxExtendedId = 0x10000000
+};
+
+enum {
+    MaxPayload = 8,
+    MaxPayloadFd = 64
+};
+
+HexIntegerValidator::HexIntegerValidator(QObject *parent) :
+    QValidator(parent),
+    m_maximum(MaxStandardId)
+{
+}
+
+QValidator::State HexIntegerValidator::validate(QString &input, int &) const
+{
+    bool ok;
+    uint value = input.toUInt(&ok, 16);
+
+    if (input.isEmpty())
+        return Intermediate;
+
+    if (!ok || value > m_maximum)
+        return Invalid;
+
+    return Acceptable;
+}
+
+void HexIntegerValidator::setMaximum(uint maximum)
+{
+    m_maximum = maximum;
+}
+
 IGTable::IGTable(QWidget *parent) :
     QTableWidget(parent)
 {
+    m_hexIntegerValidator = new HexIntegerValidator(this);
+
     this->setColumnCount(14);
     this->setRowCount(1);
 

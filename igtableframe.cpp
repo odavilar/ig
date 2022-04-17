@@ -24,3 +24,6 @@ void IGTableFrame::print()
 //{
 
 //}
+
+quint32 IGTableFrame::getIdentifier(){return m_identifier;}
+QByteArray * IGTableFrame::getData(){return m_data;}
