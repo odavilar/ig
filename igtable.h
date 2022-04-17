@@ -7,10 +7,12 @@
 #include <QMouseEvent>
 #include <QDebug>
 #include <QComboBox>
+#include "igtableframe.h"
 
 class IGTable : public QTableWidget
 {
     Q_OBJECT
+
 public:
     explicit IGTable(QWidget *parent = nullptr);
     void addRow(void);
@@ -20,9 +22,12 @@ public:
 protected:
     void mouseDoubleClickEvent(QMouseEvent *event);
 
+signals:
+    void sendButtonClicked(IGTableFrame *frame);
+
 public slots:
     void deleteButtonClicked();
-
+    void sendClicked();
 
 };
 

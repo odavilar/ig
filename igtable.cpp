@@ -70,7 +70,7 @@ IGTable::IGTable(QWidget *parent) :
     this->setItem(0,0,itemRow0);
 
     QTableWidgetItem *itemRow1 = new QTableWidgetItem();
-    itemRow1->setText("0x13E");
+    itemRow1->setText("13E");
     this->setItem(0,1,itemRow1);
 
     QComboBox * channelBox = new QComboBox();
@@ -78,39 +78,39 @@ IGTable::IGTable(QWidget *parent) :
 
     QPushButton * sendButton = new QPushButton("Send");
     this->setCellWidget(0,3, sendButton);
-    //connect(sendButton, &QPushButton::clicked, this->parent, sendButton);
+    connect(sendButton, &QPushButton::clicked, this, &IGTable::sendClicked);
 
     QTableWidgetItem *period = new QTableWidgetItem("1000");
     period->setCheckState(Qt::Unchecked);
     this->setItem(0,4,period);
 
     QTableWidgetItem *itemRow5 = new QTableWidgetItem();
-    itemRow5->setText("0x00");
+    itemRow5->setText("00");
 
     this->setItem(0,5,itemRow5);
     QTableWidgetItem *itemRow6 = new QTableWidgetItem();
-    itemRow6->setText("0x00");
+    itemRow6->setText("00");
     this->setItem(0,6,itemRow6);
     QTableWidgetItem *itemRow7 = new QTableWidgetItem();
-    itemRow7->setText("0x00");
+    itemRow7->setText("00");
     this->setItem(0,7,itemRow7);
     QTableWidgetItem *itemRow8 = new QTableWidgetItem();
-    itemRow8->setText("0x00");
+    itemRow8->setText("00");
     this->setItem(0,8,itemRow8);
     QTableWidgetItem *itemRow9 = new QTableWidgetItem();
-    itemRow9->setText("0x00");
+    itemRow9->setText("00");
     this->setItem(0,9,itemRow9);
 
     QTableWidgetItem *itemRow10 = new QTableWidgetItem();
-    itemRow10->setText("0x00");
+    itemRow10->setText("00");
     this->setItem(0,10,itemRow10);
 
     QTableWidgetItem *itemRow11 = new QTableWidgetItem();
-    itemRow11->setText("0x00");
+    itemRow11->setText("00");
     this->setItem(0,11,itemRow11);
 
     QTableWidgetItem *itemRow12 = new QTableWidgetItem();
-    itemRow12->setText("0x00");
+    itemRow12->setText("00");
     this->setItem(0,12,itemRow12);
 
     DeleteMsgButton *deleteMsgButton = new DeleteMsgButton();
@@ -151,13 +151,14 @@ void IGTable::setRow(int row)
 
     period->setCheckState(Qt::Unchecked);
 
-    model->setData(model->index(row,1),QStringLiteral("0x000"));
+    model->setData(model->index(row,1),QStringLiteral("000"));
 
     for(int i = 5; i<=12;i++)
     {
-        model->setData(model->index(row,i),QStringLiteral("0x00"));
+        model->setData(model->index(row,i),QStringLiteral("00"));
     }
     connect(deleteMsgButton, &QPushButton::clicked, this, &IGTable::deleteButtonClicked);
+    connect(sendButton, &QPushButton::clicked, this, &IGTable::sendClicked);
 }
 
 void IGTable::addRow()
@@ -173,4 +174,30 @@ void IGTable::deleteButtonClicked()
     QModelIndex index = this->indexAt(button->pos());
     qDebug()<<__FUNCTION__<<index.row();
     this->removeRow(index.row());
+}
+
+void IGTable::sendClicked()
+{
+    QPushButton *button = dynamic_cast<QPushButton*>(QObject::sender());
+    QModelIndex index = this->indexAt(button->pos());
+    bool periodic = false;
+
+    qDebug()<<__FUNCTION__<<index.row();
+
+    if(this->item(index.row(),4)->checkState() == Qt::Checked)
+        periodic = true;
+
+    QByteArray data;
+    data.resize(8);
+    for(int i = 0; i < data.size(); i++)
+    {
+        data[i] = this->item(index.row(),i + 5)->text().toUInt(nullptr, 16);
+    }
+
+    IGTableFrame * frame = new IGTableFrame(this->item(index.row(),1)->text().toUInt(nullptr, 16),periodic,this->item(index.row(),4)->text().toFloat(),data);
+    //frame->print();
+    emit sendButtonClicked(frame);
+
+    delete frame;
+    frame = nullptr;
 }

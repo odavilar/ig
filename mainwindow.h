@@ -4,6 +4,7 @@
 #include <QMainWindow>
 #include <QCanBusDevice>
 #include <QLabel>
+#include "igtableframe.h"
 
 class ConnectDialog;
 class IGTable;
@@ -23,6 +24,9 @@ public:
     void busStatus();
     void disconnectDevice();
 
+public slots:
+    void sendButtonClicked(IGTableFrame *frame);
+
 private:
     Ui::MainWindow *ui;
     ConnectDialog *m_connectDialog = nullptr;
@@ -38,7 +42,5 @@ private:
 
     void initConnections();
 
-public slots:
-    void sendButton();
 };
 #endif // MAINWINDOW_H

@@ -43,6 +43,7 @@ void MainWindow::initConnections()
         m_connectDialog->show();
     });
 
+    connect(m_igTable, SIGNAL(sendButtonClicked(IGTableFrame*)), this, SLOT(sendButtonClicked(IGTableFrame*)));
 }
 
 void MainWindow::connectDevice()
@@ -105,7 +106,8 @@ void MainWindow::disconnectDevice()
     m_status->setText(tr("Disconnected"));
 }
 
-void MainWindow::sendButton()
+void MainWindow::sendButtonClicked(IGTableFrame *frame)
 {
-    qDebug() << "heall yeah";
+    qDebug()<<"Just in case";
+    frame->print();
 }

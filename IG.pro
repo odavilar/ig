@@ -8,9 +8,12 @@ CONFIG += c++11
 # In order to do so, uncomment the following line.
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
+INCLUDEPATH += serialbus/
+
 SOURCES += \
     deletemsgbutton.cpp \
     igtable.cpp \
+    igtableframe.cpp \
     main.cpp \
     mainwindow.cpp \
     serialbus/bitratebox.cpp \
@@ -19,6 +22,7 @@ SOURCES += \
 HEADERS += \
     deletemsgbutton.h \
     igtable.h \
+    igtableframe.h \
     mainwindow.h \
     serialbus/bitratebox.h \
     serialbus/connectdialog.h
