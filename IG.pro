@@ -11,6 +11,7 @@ CONFIG += c++11
 INCLUDEPATH += serialbus/
 
 SOURCES += \
+    canmgr.cpp \
     deletemsgbutton.cpp \
     igtable.cpp \
     igtableframe.cpp \
@@ -20,6 +21,7 @@ SOURCES += \
     serialbus/connectdialog.cpp
 
 HEADERS += \
+    canmgr.h \
     deletemsgbutton.h \
     igtable.h \
     igtableframe.h \

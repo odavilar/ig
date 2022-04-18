@@ -21,6 +21,8 @@ MainWindow::MainWindow(QWidget *parent)
     m_igTable = new IGTable(this);
     this->setCentralWidget(m_igTable);
 
+    m_canmgr = new CANMgr();
+
     m_connectDialog = new ConnectDialog;
 
     m_connectMenuAction = new QAction(tr("&Connect"), this);
@@ -49,69 +51,35 @@ void MainWindow::initConnections()
 
 void MainWindow::connectDevice()
 {
+    QString resultString;
+
     const ConnectDialog::Settings p = m_connectDialog->settings();
+    CANMgr::Settings canSettings;
+\
+    canSettings.configurations = p.configurations;
 
-    QString errorString;
-    m_canDevice.reset(QCanBus::instance()->createDevice(p.pluginName, p.deviceInterfaceName,
-                                                        &errorString));
-    if (!m_canDevice) {
-        m_status->setText(tr("Error creating device '%1', reason: '%2'")
-                          .arg(p.pluginName).arg(errorString));
-        return;
+    for( auto config : p.configurations)
+    {
+        canSettings.configurations.append(p.configurations);
     }
 
-    m_numberFramesWritten = 0;
+    canSettings.deviceInterfaceName = p.deviceInterfaceName;
+    canSettings.pluginName = p.pluginName;
+    canSettings.useConfigurationEnabled = p.useConfigurationEnabled;
 
-    if (p.useConfigurationEnabled) {
-        for (const ConnectDialog::ConfigurationItem &item : p.configurations)
-            m_canDevice->setConfigurationParameter(item.first, item.second);
-    }
-
-    if (!m_canDevice->connectDevice()) {
-        m_status->setText(tr("Connection error: %1").arg(m_canDevice->errorString()));
-
-        m_canDevice.reset();
-    } else {
-
-        const QVariant bitRate = m_canDevice->configurationParameter(QCanBusDevice::BitRateKey);
-        if (bitRate.isValid()) {
-            const bool isCanFd =
-                    m_canDevice->configurationParameter(QCanBusDevice::CanFdKey).toBool();
-            const QVariant dataBitRate =
-                    m_canDevice->configurationParameter(QCanBusDevice::DataBitRateKey);
-            if (isCanFd && dataBitRate.isValid()) {
-                m_status->setText(tr("Plugin: %1, connected to %2 at %3 / %4 kBit/s")
-                                  .arg(p.pluginName).arg(p.deviceInterfaceName)
-                                  .arg(bitRate.toInt() / 1000).arg(dataBitRate.toInt() / 1000));
-            } else {
-                m_status->setText(tr("Plugin: %1, connected to %2 at %3 kBit/s")
-                                  .arg(p.pluginName).arg(p.deviceInterfaceName)
-                                  .arg(bitRate.toInt() / 1000));
-            }
-        } else {
-            m_status->setText(tr("Plugin: %1, connected to %2")
-                    .arg(p.pluginName).arg(p.deviceInterfaceName));
-        }
-
-    }
+    m_canmgr->connectDevice(canSettings, &resultString);
+    m_status->setText(resultString);
 }
 
 
 void MainWindow::disconnectDevice()
 {
-    if (!m_canDevice)
-        return;
-
-    m_canDevice->disconnectDevice();
-
+    m_canmgr->disconnectDevice();
     m_status->setText(tr("Disconnected"));
 }
 
 void MainWindow::sendButtonClicked(IGTableFrame *frame)
 {
-    //frame->print();
-    QCanBusFrame * canFrame;
-    canFrame = new QCanBusFrame(frame->getIdentifier(), *frame->getData());
-    m_canDevice->writeFrame(*canFrame);
-    delete canFrame;
+    frame->print();
+    m_canmgr->sendFrame(frame);
 }

@@ -2,23 +2,17 @@
 #define IGTABLEFRAME_H
 
 #include <QObject>
+#include <QCanBusFrame>
 
-class IGTableFrame : public QObject
+class IGTableFrame : public QCanBusFrame
 {
-    Q_OBJECT
 public:
-    explicit IGTableFrame(QObject *parent = nullptr);
-    explicit IGTableFrame(qint32 identifier, bool periodic, float cycle, const QByteArray &data, QObject *parent = nullptr);
-    //~IGTableFrame();
+    explicit IGTableFrame(qint32 identifier, bool periodic, float cycle, const QByteArray &data);
     void print();
-    quint32 getIdentifier();
-    QByteArray * getData();
 
 private:
-    quint32 m_identifier = 0;
     bool m_periodic = false;
     float m_cycle = 0;
-    QByteArray *m_data = nullptr;
 };
 
 #endif // IGTABLEFRAME_H

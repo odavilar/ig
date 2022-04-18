@@ -5,6 +5,7 @@
 #include <QCanBusDevice>
 #include <QLabel>
 #include "igtableframe.h"
+#include "canmgr.h"
 
 class ConnectDialog;
 class IGTable;
@@ -33,12 +34,12 @@ private:
     QAction * m_connectMenuAction = nullptr;
     IGTable * m_igTable = nullptr;
 
-    qint64 m_numberFramesWritten = 0;
     Ui::MainWindow *m_ui = nullptr;
     QLabel *m_status = nullptr;
     QLabel *m_written = nullptr;
     std::unique_ptr<QCanBusDevice> m_canDevice;
     QTimer *m_busStatusTimer = nullptr;
+    CANMgr * m_canmgr = nullptr;
 
     void initConnections();
 
