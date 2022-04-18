@@ -56,13 +56,7 @@ void MainWindow::connectDevice()
     const ConnectDialog::Settings p = m_connectDialog->settings();
     CANMgr::Settings canSettings;
 \
-    canSettings.configurations = p.configurations;
-
-    for( auto config : p.configurations)
-    {
-        canSettings.configurations.append(p.configurations);
-    }
-
+    canSettings.configurations.append(p.configurations);
     canSettings.deviceInterfaceName = p.deviceInterfaceName;
     canSettings.pluginName = p.pluginName;
     canSettings.useConfigurationEnabled = p.useConfigurationEnabled;
