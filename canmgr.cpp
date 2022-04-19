@@ -3,12 +3,15 @@
 CANMgr::CANMgr()
 {
     m_TimerList = new QList<QTimer>();
+    m_PeriodicFrames = new QMultiMap<qint32, IGTableFrame>();
 }
 
 
 CANMgr::~CANMgr()
 {
     delete m_TimerList;
+    m_PeriodicFrames->clear();
+    delete m_PeriodicFrames;
 }
 
 int CANMgr::connectDevice(const Settings &p, QString * resultString)
@@ -76,6 +79,17 @@ void CANMgr::disconnectDevice()
 
 int CANMgr::sendFrame(IGTableFrame * frame)
 {
+    if(!m_canDevice)
+        return -1;
+
     m_canDevice->writeFrame(*frame);
     return 0;
+}
+
+int CANMgr::updatePeriodicFrames(QList<IGTableFrame> *frames)
+{
+    m_PeriodicFrames->clear(); // Will it destroy all inner objects?
+
+    for(auto& frame : *frames)
+        m_PeriodicFrames->insert(frame.getCycle(), frame);
 }

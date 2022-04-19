@@ -29,10 +29,12 @@ public:
     int busStatus();
     void disconnectDevice();
     int sendFrame(IGTableFrame * frame);
+    int updatePeriodicFrames(QList<IGTableFrame> *frames);
 
 private:
     std::unique_ptr<QCanBusDevice> m_canDevice;
     QList<QTimer> * m_TimerList;
+    QMultiMap<qint32, IGTableFrame> * m_PeriodicFrames;
     qint64 m_numberFramesWritten = 0;
 
 };

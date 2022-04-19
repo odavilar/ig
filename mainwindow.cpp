@@ -47,6 +47,8 @@ void MainWindow::initConnections()
     });
 
     connect(m_igTable, SIGNAL(sendButtonClicked(IGTableFrame*)), this, SLOT(sendButtonClicked(IGTableFrame*)));
+
+    connect(m_igTable, SIGNAL(periodicClicked), this, SLOT(updatePeriodicFrames));
 }
 
 void MainWindow::connectDevice()
@@ -76,4 +78,9 @@ void MainWindow::sendButtonClicked(IGTableFrame *frame)
 {
     frame->print();
     m_canmgr->sendFrame(frame);
+}
+
+void MainWindow::updatePeriodicFrames()
+{
+    m_canmgr->updatePeriodicFrames(nullptr);
 }

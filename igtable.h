@@ -36,12 +36,15 @@ public:
 protected:
     void mouseDoubleClickEvent(QMouseEvent *event);
 
+
 signals:
     void sendButtonClicked(IGTableFrame *frame);
+    void periodicClicked();
 
 public slots:
     void deleteButtonClicked();
     void sendClicked();
+    void tableCellChanged(int row, int column);
 
 private:
     HexIntegerValidator *m_hexIntegerValidator = nullptr;

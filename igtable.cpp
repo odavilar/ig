@@ -11,6 +11,24 @@ enum {
     MaxPayloadFd = 64
 };
 
+enum Column {
+    messageName,
+    identifier,
+    channel,
+    sendButton,
+    periodTime,
+    d0,
+    d1,
+    d2,
+    d3,
+    d4,
+    d5,
+    d6,
+    d7,
+    deleteButton,
+    maxColumns
+};
+
 HexIntegerValidator::HexIntegerValidator(QObject *parent) :
     QValidator(parent),
     m_maximum(MaxStandardId)
@@ -41,121 +59,122 @@ IGTable::IGTable(QWidget *parent) :
 {
     m_hexIntegerValidator = new HexIntegerValidator(this);
 
-    this->setColumnCount(14);
+    this->setColumnCount(Column::maxColumns);
     this->setRowCount(1);
 
     QTableWidgetItem *messageNameHeader = new QTableWidgetItem();
     messageNameHeader->setText("Message Name");
-    this->setHorizontalHeaderItem(0, messageNameHeader);
+    this->setHorizontalHeaderItem(Column::messageName, messageNameHeader);
 
     QTableWidgetItem *identifierHeader = new QTableWidgetItem();
     identifierHeader->setText("Identifier");
-    this->setHorizontalHeaderItem(1, identifierHeader);
+    this->setHorizontalHeaderItem(Column::identifier, identifierHeader);
 
     QTableWidgetItem *channelHeader = new QTableWidgetItem();
     channelHeader->setText("Channel");
-    this->setHorizontalHeaderItem(2, channelHeader);
-    this->setColumnHidden(2, true); //Hide channel column
+    this->setHorizontalHeaderItem(Column::channel, channelHeader);
+    this->setColumnHidden(Column::channel, true); //Hide channel column
 
     QTableWidgetItem *sendHeader = new QTableWidgetItem();
     sendHeader->setText("Send");
-    this->setHorizontalHeaderItem(3, sendHeader);
+    this->setHorizontalHeaderItem(Column::sendButton, sendHeader);
 
     QTableWidgetItem *cycleTimeHeader = new QTableWidgetItem();
     cycleTimeHeader->setText("Cycle Time");
-    this->setHorizontalHeaderItem(4, cycleTimeHeader);
+    this->setHorizontalHeaderItem(Column::periodTime, cycleTimeHeader);
 
     QTableWidgetItem *d0Header = new QTableWidgetItem();
     d0Header->setText("0");
-    this->setHorizontalHeaderItem(5, d0Header);
+    this->setHorizontalHeaderItem(Column::d0, d0Header);
 
     QTableWidgetItem *d1Header = new QTableWidgetItem();
     d1Header->setText("1");
-    this->setHorizontalHeaderItem(6, d1Header);
+    this->setHorizontalHeaderItem(Column::d1, d1Header);
 
     QTableWidgetItem *d2Header = new QTableWidgetItem();
     d2Header->setText("2");
-    this->setHorizontalHeaderItem(7, d2Header);
+    this->setHorizontalHeaderItem(Column::d2, d2Header);
 
     QTableWidgetItem *d3Header = new QTableWidgetItem();
     d3Header->setText("3");
-    this->setHorizontalHeaderItem(8, d3Header);
+    this->setHorizontalHeaderItem(Column::d3, d3Header);
 
     QTableWidgetItem *d4Header = new QTableWidgetItem();
     d4Header ->setText("4");
-    this->setHorizontalHeaderItem(9, d4Header);
+    this->setHorizontalHeaderItem(Column::d4, d4Header);
 
     QTableWidgetItem * d5Header= new QTableWidgetItem();
     d5Header->setText("5");
-    this->setHorizontalHeaderItem(10, d5Header);
+    this->setHorizontalHeaderItem(Column::d5, d5Header);
 
     QTableWidgetItem *d6Header = new QTableWidgetItem();
     d6Header->setText("6");
-    this->setHorizontalHeaderItem(11, d6Header);
+    this->setHorizontalHeaderItem(Column::d6, d6Header);
 
     QTableWidgetItem *d7Header = new QTableWidgetItem();
     d7Header->setText("7");
-    this->setHorizontalHeaderItem(12, d7Header);
+    this->setHorizontalHeaderItem(Column::d7, d7Header);
 
     QTableWidgetItem *deleteHeader = new QTableWidgetItem();
     deleteHeader->setText("Delete");
-    this->setHorizontalHeaderItem(13, deleteHeader);
+    this->setHorizontalHeaderItem(Column::deleteButton, deleteHeader);
 
 
     QTableWidgetItem *itemRow0 = new QTableWidgetItem();
     itemRow0->setText("Ignition On");
-    this->setItem(0,0,itemRow0);
+    this->setItem(0,Column::messageName,itemRow0);
 
     QTableWidgetItem *itemRow1 = new QTableWidgetItem();
     itemRow1->setText("13E");
-    this->setItem(0,1,itemRow1);
+    this->setItem(0,Column::identifier,itemRow1);
 
     QComboBox * channelBox = new QComboBox();
-    this->setCellWidget(0,2, channelBox);
+    this->setCellWidget(0,Column::channel, channelBox);
 
     QPushButton * sendButton = new QPushButton("Send");
-    this->setCellWidget(0,3, sendButton);
+    this->setCellWidget(0,Column::sendButton, sendButton);
     connect(sendButton, &QPushButton::clicked, this, &IGTable::sendClicked);
 
     QTableWidgetItem *period = new QTableWidgetItem("1000");
     period->setCheckState(Qt::Unchecked);
-    this->setItem(0,4,period);
+    this->setItem(0,Column::periodTime,period);
 
     QTableWidgetItem *itemRow5 = new QTableWidgetItem();
     itemRow5->setText("00");
-
-    this->setItem(0,5,itemRow5);
+    this->setItem(0,Column::d0,itemRow5);
     QTableWidgetItem *itemRow6 = new QTableWidgetItem();
     itemRow6->setText("00");
-    this->setItem(0,6,itemRow6);
+    this->setItem(0,Column::d1,itemRow6);
     QTableWidgetItem *itemRow7 = new QTableWidgetItem();
     itemRow7->setText("00");
-    this->setItem(0,7,itemRow7);
+    this->setItem(0,Column::d2,itemRow7);
     QTableWidgetItem *itemRow8 = new QTableWidgetItem();
     itemRow8->setText("00");
-    this->setItem(0,8,itemRow8);
+    this->setItem(0,Column::d3,itemRow8);
     QTableWidgetItem *itemRow9 = new QTableWidgetItem();
     itemRow9->setText("00");
-    this->setItem(0,9,itemRow9);
+    this->setItem(0,Column::d4,itemRow9);
 
     QTableWidgetItem *itemRow10 = new QTableWidgetItem();
     itemRow10->setText("00");
-    this->setItem(0,10,itemRow10);
+    this->setItem(0,Column::d5,itemRow10);
 
     QTableWidgetItem *itemRow11 = new QTableWidgetItem();
     itemRow11->setText("00");
-    this->setItem(0,11,itemRow11);
+    this->setItem(0,Column::d6,itemRow11);
 
     QTableWidgetItem *itemRow12 = new QTableWidgetItem();
     itemRow12->setText("00");
-    this->setItem(0,12,itemRow12);
+    this->setItem(0,Column::d7,itemRow12);
 
     DeleteMsgButton *deleteMsgButton = new DeleteMsgButton();
-    this->setCellWidget(0, 13, dynamic_cast <QWidget*>(deleteMsgButton));
+    this->setCellWidget(0, Column::deleteButton, dynamic_cast <QWidget*>(deleteMsgButton));
     deleteMsgButton->setDisabled(true);
 
     this->setSizeAdjustPolicy(QAbstractScrollArea::AdjustToContents);
     this->resizeColumnsToContents();
+
+    connect(this, SIGNAL(cellChanged(int, int)), this, SLOT(tableCellChanged(int, int)));
 }
 
 void IGTable::mouseDoubleClickEvent(QMouseEvent *event)
@@ -181,14 +200,14 @@ void IGTable::setRow(int row)
 
     auto model = this->model();
 
-    this->setCellWidget(row,13, dynamic_cast <QWidget*>(deleteMsgButton));
-    this->setCellWidget(row,3, sendButton);
-    this->setItem(row, 4, period);
-    this->setCellWidget(row,2, comboBox);
+    this->setCellWidget(row, Column::deleteButton, dynamic_cast <QWidget*>(deleteMsgButton));
+    this->setCellWidget(row, Column::sendButton, sendButton);
+    this->setItem(row, Column::periodTime, period);
+    this->setCellWidget(row, Column::channel, comboBox);
 
     period->setCheckState(Qt::Unchecked);
 
-    model->setData(model->index(row,1),QStringLiteral("000"));
+    model->setData(model->index(row,Column::identifier),QStringLiteral("000"));
 
     for(int i = 5; i<=12;i++)
     {
@@ -237,4 +256,10 @@ void IGTable::sendClicked()
 
     delete frame;
     frame = nullptr;
+}
+
+void IGTable::tableCellChanged(int row, int column)
+{
+    if(column == Column::periodTime)
+        qDebug()<<__FUNCTION__<<" "<<this->item(row,column)->checkState();
 }

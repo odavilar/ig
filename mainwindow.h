@@ -27,6 +27,7 @@ public:
 
 public slots:
     void sendButtonClicked(IGTableFrame *frame);
+    void updatePeriodicFrames();
 
 private:
     Ui::MainWindow *ui;
