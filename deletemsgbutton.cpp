@@ -2,6 +2,7 @@
 
 DeleteMsgButton::DeleteMsgButton()
 {
-    QIcon * deleteIcon = new QIcon(":/icons/delete");
-    this->setIcon(*deleteIcon);
+    QIcon deleteIcon = QIcon(":/icons/delete");
+    this->setIcon(deleteIcon);
 }
+

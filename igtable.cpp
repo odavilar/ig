@@ -228,7 +228,7 @@ void IGTable::deleteButtonClicked()
 {
     QPushButton *button = dynamic_cast<QPushButton*>(QObject::sender());
     QModelIndex index = this->indexAt(button->pos());
-    qDebug()<<__FUNCTION__<<index.row();
+
     this->removeRow(index.row());
 }
 
@@ -247,10 +247,15 @@ void IGTable::sendClicked()
     data.resize(8);
     for(int i = 0; i < data.size(); i++)
     {
-        data[i] = this->item(index.row(),i + 5)->text().toUInt(nullptr, 16);
+        data[i] = this->item(index.row(),i + Column::d0)->text().toUInt(nullptr, 16);
     }
 
-    IGTableFrame * frame = new IGTableFrame(this->item(index.row(),1)->text().toUInt(nullptr, 16),periodic,this->item(index.row(),4)->text().toFloat(),data);
+    IGTableFrame * frame =
+            new IGTableFrame(
+                this->item(index.row(),Column::identifier)->text().toUInt(nullptr, 16),
+                periodic,
+                this->item(index.row(),Column::periodTime)->text().toUInt()
+                ,data);
     //frame->print();
     emit sendButtonClicked(frame);
 
@@ -260,6 +265,28 @@ void IGTable::sendClicked()
 
 void IGTable::tableCellChanged(int row, int column)
 {
-    if(column == Column::periodTime)
-        qDebug()<<__FUNCTION__<<" "<<this->item(row,column)->checkState();
+    QList<IGTableFrame> framesList;
+
+    (void)row;
+    (void)column;
+
+    for(int row = 0; row < this->rowCount(); row++)
+    {
+        if(this->item(row, Column::periodTime)->checkState() == Qt::Checked)
+        {
+            QByteArray data;
+            data.resize(8);
+            for(int i = 0; i < data.size(); i++)
+            {
+                data[i] = this->item(row,i + Column::d0)->text().toUInt(nullptr, 16);
+            }
+            IGTableFrame frame = IGTableFrame(this->item(row, Column::identifier)->text().toUInt(nullptr, 16),
+                         true,
+                         this->item(row,Column::periodTime)->text().toUInt(),
+                         data);
+            framesList.append(frame);
+        }
+    }
+
+    emit updatePeriodicFrames(&framesList);
 }

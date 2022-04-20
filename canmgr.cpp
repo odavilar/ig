@@ -92,4 +92,6 @@ int CANMgr::updatePeriodicFrames(QList<IGTableFrame> *frames)
 
     for(auto& frame : *frames)
         m_PeriodicFrames->insert(frame.getCycle(), frame);
+
+    return 0;
 }

@@ -35,6 +35,12 @@ MainWindow::MainWindow(QWidget *parent)
 
 MainWindow::~MainWindow()
 {
+    delete m_status;
+    delete m_written;
+    delete m_igTable;
+    delete m_canmgr;
+    delete m_connectDialog;
+    delete m_connectMenuAction;
     delete ui;
 }
 
@@ -48,7 +54,7 @@ void MainWindow::initConnections()
 
     connect(m_igTable, SIGNAL(sendButtonClicked(IGTableFrame*)), this, SLOT(sendButtonClicked(IGTableFrame*)));
 
-    connect(m_igTable, SIGNAL(periodicClicked), this, SLOT(updatePeriodicFrames));
+    connect(m_igTable, SIGNAL(updatePeriodicFrames(QList<IGTableFrame>*)), this, SLOT(updatePeriodicFrames(QList<IGTableFrame>*)));
 }
 
 void MainWindow::connectDevice()
@@ -80,7 +86,7 @@ void MainWindow::sendButtonClicked(IGTableFrame *frame)
     m_canmgr->sendFrame(frame);
 }
 
-void MainWindow::updatePeriodicFrames()
+void MainWindow::updatePeriodicFrames(QList<IGTableFrame> *periodicFrames)
 {
-    m_canmgr->updatePeriodicFrames(nullptr);
+    m_canmgr->updatePeriodicFrames(periodicFrames);
 }

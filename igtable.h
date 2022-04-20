@@ -39,7 +39,7 @@ protected:
 
 signals:
     void sendButtonClicked(IGTableFrame *frame);
-    void periodicClicked();
+    void updatePeriodicFrames(QList<IGTableFrame> * periodicFrames);
 
 public slots:
     void deleteButtonClicked();
