@@ -17,6 +17,7 @@ SOURCES += \
     igtableframe.cpp \
     main.cpp \
     mainwindow.cpp \
+    measurementworker.cpp \
     serialbus/bitratebox.cpp \
     serialbus/connectdialog.cpp
 
@@ -26,6 +27,7 @@ HEADERS += \
     igtable.h \
     igtableframe.h \
     mainwindow.h \
+    measurementworker.h \
     serialbus/bitratebox.h \
     serialbus/connectdialog.h
 

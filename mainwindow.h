@@ -33,6 +33,8 @@ private:
     Ui::MainWindow *ui;
     ConnectDialog *m_connectDialog = nullptr;
     QAction * m_connectMenuAction = nullptr;
+    QAction * m_startMenuAction = nullptr;
+    QAction * m_stopMenuAction = nullptr;
     IGTable * m_igTable = nullptr;
 
     Ui::MainWindow *m_ui = nullptr;

@@ -6,7 +6,6 @@ CANMgr::CANMgr()
     m_PeriodicFrames = new QMultiMap<qint32, IGTableFrame>();
 }
 
-
 CANMgr::~CANMgr()
 {
     delete m_TimerList;
@@ -88,10 +87,42 @@ int CANMgr::sendFrame(IGTableFrame * frame)
 
 int CANMgr::updatePeriodicFrames(QList<IGTableFrame> *frames)
 {
+    QMutexLocker locker(&m_mutex);
     m_PeriodicFrames->clear(); // Will it destroy all inner objects?
 
     for(auto& frame : *frames)
         m_PeriodicFrames->insert(frame.getCycle(), frame);
 
+
+
+    emit framesUpdated(m_PeriodicFrames);
+
+    locker.unlock();
+
     return 0;
+}
+
+void CANMgr::startMeasurement()
+{
+    QThread* thread = new QThread();
+    MeasurementWorker* worker = new MeasurementWorker();
+    worker->moveToThread(thread);
+    connect( worker, &MeasurementWorker::error, this, &CANMgr::errorString);
+    connect( thread, &QThread::started, worker, &MeasurementWorker::process);
+    connect( worker, &MeasurementWorker::finished, thread, &QThread::quit);
+    connect( worker, &MeasurementWorker::finished, worker, &MeasurementWorker::deleteLater);
+    connect( thread, &QThread::finished, thread, &QThread::deleteLater);
+    connect(this, &CANMgr::stopMeasurementThread, worker,  &MeasurementWorker::stopMeasurement);
+    connect(this, &CANMgr::framesUpdated, worker,  &MeasurementWorker::framesUpdated);
+    thread->start();
+}
+
+void CANMgr::stopMeasurement()
+{
+    emit stopMeasurementThread();
+}
+
+void CANMgr::errorString(QString err)
+{
+    qCritical()<<err;
 }

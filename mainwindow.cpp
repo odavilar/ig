@@ -30,6 +30,14 @@ MainWindow::MainWindow(QWidget *parent)
 
     ui->menubar->addAction(m_connectMenuAction);
 
+    m_startMenuAction = new QAction(tr("Start"), this);
+    m_startMenuAction->setStatusTip(tr("Start measurement"));
+    ui->menubar->addAction(m_startMenuAction);
+
+    m_stopMenuAction = new QAction(tr("Stop"), this);
+    m_stopMenuAction->setStatusTip(tr("Stop measurement"));
+    ui->menubar->addAction(m_stopMenuAction);
+
     initConnections();
 }
 
@@ -41,6 +49,8 @@ MainWindow::~MainWindow()
     delete m_canmgr;
     delete m_connectDialog;
     delete m_connectMenuAction;
+    delete m_startMenuAction;
+    delete m_stopMenuAction;
     delete ui;
 }
 
@@ -50,6 +60,14 @@ void MainWindow::initConnections()
 
     connect(m_connectMenuAction, &QAction::triggered, [this]() {
         m_connectDialog->show();
+    });
+
+    connect(m_startMenuAction, &QAction::triggered, m_canmgr, [this]() {
+        m_canmgr->startMeasurement();
+    });
+
+    connect(m_stopMenuAction, &QAction::triggered, m_canmgr, [this]() {
+        m_canmgr->stopMeasurement();
     });
 
     connect(m_igTable, SIGNAL(sendButtonClicked(IGTableFrame*)), this, SLOT(sendButtonClicked(IGTableFrame*)));

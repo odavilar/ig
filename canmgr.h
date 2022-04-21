@@ -6,9 +6,13 @@
 #include <QCanBusFrame>
 #include <QCanBusDevice>
 #include <QCanBus>
+#include <QVariant>
+#include <QThread>
+#include <QMutexLocker>
+
 #include <memory>
 #include "igtableframe.h"
-#include <QVariant>
+#include "measurementworker.h"
 
 class CANMgr : public QObject
 {
@@ -30,13 +34,21 @@ public:
     void disconnectDevice();
     int sendFrame(IGTableFrame * frame);
     int updatePeriodicFrames(QList<IGTableFrame> *frames);
+    void startMeasurement();
+    void stopMeasurement();
+    void errorString(QString err);
+    void getPeriodicFrames(QMultiMap<qint32, IGTableFrame> * frames);
+
+signals:
+    void stopMeasurementThread();
+    void framesUpdated(QMultiMap<qint32, IGTableFrame> *frames);
 
 private:
     std::unique_ptr<QCanBusDevice> m_canDevice;
     QList<QTimer> * m_TimerList;
     QMultiMap<qint32, IGTableFrame> * m_PeriodicFrames;
     qint64 m_numberFramesWritten = 0;
-
+    QMutex m_mutex;
 };
 
 #endif // CANMGR_H
