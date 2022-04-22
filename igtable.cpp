@@ -12,6 +12,8 @@ enum {
 };
 
 enum Column {
+    uuid,
+    deleteButton,
     messageName,
     identifier,
     channel,
@@ -25,7 +27,6 @@ enum Column {
     d5,
     d6,
     d7,
-    deleteButton,
     maxColumns
 };
 
@@ -61,6 +62,10 @@ IGTable::IGTable(QWidget *parent) :
 
     this->setColumnCount(Column::maxColumns);
     this->setRowCount(1);
+
+    QTableWidgetItem *uuidHeader = new QTableWidgetItem();
+    uuidHeader->setText("Uuid");
+    this->setHorizontalHeaderItem(Column::uuid, uuidHeader);
 
     QTableWidgetItem *messageNameHeader = new QTableWidgetItem();
     messageNameHeader->setText("Message Name");
@@ -119,14 +124,19 @@ IGTable::IGTable(QWidget *parent) :
     deleteHeader->setText("Delete");
     this->setHorizontalHeaderItem(Column::deleteButton, deleteHeader);
 
+    QTableWidgetItem *itemUuid = new QTableWidgetItem();
+    QUuid uuid = QUuid::createUuid();
+    itemUuid->setText(uuid.toString(QUuid::WithoutBraces));
+    this->setItem(0,Column::uuid,itemUuid);
+    this->setColumnHidden(Column::uuid, true); //Hide uuid column
 
-    QTableWidgetItem *itemRow0 = new QTableWidgetItem();
-    itemRow0->setText("Ignition On");
-    this->setItem(0,Column::messageName,itemRow0);
+    QTableWidgetItem *itemMessageName = new QTableWidgetItem();
+    itemMessageName->setText("Ignition On");
+    this->setItem(0,Column::messageName,itemMessageName);
 
-    QTableWidgetItem *itemRow1 = new QTableWidgetItem();
-    itemRow1->setText("13E");
-    this->setItem(0,Column::identifier,itemRow1);
+    QTableWidgetItem *itemIdentifier = new QTableWidgetItem();
+    itemIdentifier->setText("13E");
+    this->setItem(0,Column::identifier,itemIdentifier);
 
     QComboBox * channelBox = new QComboBox();
     this->setCellWidget(0,Column::channel, channelBox);
@@ -139,33 +149,33 @@ IGTable::IGTable(QWidget *parent) :
     period->setCheckState(Qt::Unchecked);
     this->setItem(0,Column::periodTime,period);
 
-    QTableWidgetItem *itemRow5 = new QTableWidgetItem();
-    itemRow5->setText("00");
-    this->setItem(0,Column::d0,itemRow5);
-    QTableWidgetItem *itemRow6 = new QTableWidgetItem();
-    itemRow6->setText("00");
-    this->setItem(0,Column::d1,itemRow6);
-    QTableWidgetItem *itemRow7 = new QTableWidgetItem();
-    itemRow7->setText("00");
-    this->setItem(0,Column::d2,itemRow7);
-    QTableWidgetItem *itemRow8 = new QTableWidgetItem();
-    itemRow8->setText("00");
-    this->setItem(0,Column::d3,itemRow8);
-    QTableWidgetItem *itemRow9 = new QTableWidgetItem();
-    itemRow9->setText("00");
-    this->setItem(0,Column::d4,itemRow9);
+    QTableWidgetItem *itemD0 = new QTableWidgetItem();
+    itemD0->setText("00");
+    this->setItem(0,Column::d0,itemD0);
+    QTableWidgetItem *itemD1 = new QTableWidgetItem();
+    itemD1->setText("00");
+    this->setItem(0,Column::d1,itemD1);
+    QTableWidgetItem *itemD2 = new QTableWidgetItem();
+    itemD2->setText("00");
+    this->setItem(0,Column::d2,itemD2);
+    QTableWidgetItem *itemD3 = new QTableWidgetItem();
+    itemD3->setText("00");
+    this->setItem(0,Column::d3,itemD3);
+    QTableWidgetItem *itemD4 = new QTableWidgetItem();
+    itemD4->setText("00");
+    this->setItem(0,Column::d4,itemD4);
 
-    QTableWidgetItem *itemRow10 = new QTableWidgetItem();
-    itemRow10->setText("00");
-    this->setItem(0,Column::d5,itemRow10);
+    QTableWidgetItem *itemD5 = new QTableWidgetItem();
+    itemD5->setText("00");
+    this->setItem(0,Column::d5,itemD5);
 
-    QTableWidgetItem *itemRow11 = new QTableWidgetItem();
-    itemRow11->setText("00");
-    this->setItem(0,Column::d6,itemRow11);
+    QTableWidgetItem *itemD6 = new QTableWidgetItem();
+    itemD6->setText("00");
+    this->setItem(0,Column::d6,itemD6);
 
-    QTableWidgetItem *itemRow12 = new QTableWidgetItem();
-    itemRow12->setText("00");
-    this->setItem(0,Column::d7,itemRow12);
+    QTableWidgetItem *itemD7 = new QTableWidgetItem();
+    itemD7->setText("00");
+    this->setItem(0,Column::d7,itemD7);
 
     DeleteMsgButton *deleteMsgButton = new DeleteMsgButton();
     this->setCellWidget(0, Column::deleteButton, dynamic_cast <QWidget*>(deleteMsgButton));
@@ -173,6 +183,17 @@ IGTable::IGTable(QWidget *parent) :
 
     this->setSizeAdjustPolicy(QAbstractScrollArea::AdjustToContents);
     this->resizeColumnsToContents();
+
+    m_frames = QSharedPointer<QHash<QString, IGTableFrame>>(new QHash<QString, IGTableFrame>());
+
+    QByteArray data;
+    data.resize(8);
+    for(int i = 0; i < data.size(); i++)
+    {
+        data[i] = 0;
+    }
+
+    m_frames->insert(uuid.toString(QUuid::WithoutBraces), IGTableFrame(uuid, itemIdentifier->text().toUInt(nullptr, 16), false, period->text().toUInt(), data));
 
     connect(this, SIGNAL(cellChanged(int, int)), this, SLOT(tableCellChanged(int, int)));
 }
@@ -194,11 +215,22 @@ void IGTable::mouseDoubleClickEvent(QMouseEvent *event)
 void IGTable::setRow(int row)
 {
     DeleteMsgButton *deleteMsgButton = new DeleteMsgButton();
-    QTableWidgetItem *period = new QTableWidgetItem("1000");
+    QTableWidgetItem *period = new QTableWidgetItem("0");
     QComboBox * comboBox = new QComboBox();
     QPushButton * sendButton = new QPushButton("Send");
+    QUuid uuid;
+    QByteArray data;
+    QString identifier = "000";
 
     auto model = this->model();
+
+    uuid = QUuid::createUuid();
+
+    data.resize(8);
+    for(int i = 0; i < data.size(); i++)
+    {
+        data[i] = 0;
+    }
 
     this->setCellWidget(row, Column::deleteButton, dynamic_cast <QWidget*>(deleteMsgButton));
     this->setCellWidget(row, Column::sendButton, sendButton);
@@ -207,12 +239,17 @@ void IGTable::setRow(int row)
 
     period->setCheckState(Qt::Unchecked);
 
-    model->setData(model->index(row,Column::identifier),QStringLiteral("000"));
+    model->setData(model->index(row,Column::messageName), "Message name");
+    model->setData(model->index(row,Column::identifier), identifier);
+    model->setData(model->index(row,Column::uuid), uuid.toString(QUuid::WithoutBraces));
 
-    for(int i = 5; i<=12;i++)
+    for(int i = Column::d0; i<=Column::d7;i++)
     {
         model->setData(model->index(row,i),QStringLiteral("00"));
     }
+
+    m_frames->insert(uuid.toString(QUuid::WithoutBraces), IGTableFrame(uuid, identifier.toUInt(), false, period->text().toUInt(), data));
+
     connect(deleteMsgButton, &QPushButton::clicked, this, &IGTable::deleteButtonClicked);
     connect(sendButton, &QPushButton::clicked, this, &IGTable::sendClicked);
 }
@@ -228,6 +265,10 @@ void IGTable::deleteButtonClicked()
 {
     QPushButton *button = dynamic_cast<QPushButton*>(QObject::sender());
     QModelIndex index = this->indexAt(button->pos());
+
+    qDebug()<<"row deleted "<<this->item(index.row(),Column::uuid)->text();
+
+    m_frames->remove(this->item(index.row(),Column::uuid)->text());
 
     this->removeRow(index.row());
 }
@@ -251,7 +292,7 @@ void IGTable::sendClicked()
     }
 
     IGTableFrame * frame =
-            new IGTableFrame(
+            new IGTableFrame( QUuid(this->item(index.row(),Column::uuid)->text()),
                 this->item(index.row(),Column::identifier)->text().toUInt(nullptr, 16),
                 periodic,
                 this->item(index.row(),Column::periodTime)->text().toUInt()
@@ -265,28 +306,63 @@ void IGTable::sendClicked()
 
 void IGTable::tableCellChanged(int row, int column)
 {
-    QList<IGTableFrame> framesList;
+    qDebug()<<"row "<<row<<" column "<<column;
+    QTableWidgetItem * item = nullptr;
 
-    (void)row;
-    (void)column;
+    item = this->item(row, Column::uuid);
+    if(!item)
+        return;
 
-    for(int row = 0; row < this->rowCount(); row++)
+    IGTableFrame frame = ((*m_frames).value(item->text()));
+
+    switch(column)
     {
-        if(this->item(row, Column::periodTime)->checkState() == Qt::Checked)
+    case Column::d0:
+    case Column::d1:
+    case Column::d2:
+    case Column::d3:
+    case Column::d4:
+    case Column::d5:
+    case Column::d6:
+    case Column::d7:
+    {
+        QByteArray data;
+        data.resize(8);
+        for(int i = 0; i < data.size(); i++)
         {
-            QByteArray data;
-            data.resize(8);
-            for(int i = 0; i < data.size(); i++)
-            {
-                data[i] = this->item(row,i + Column::d0)->text().toUInt(nullptr, 16);
-            }
-            IGTableFrame frame = IGTableFrame(this->item(row, Column::identifier)->text().toUInt(nullptr, 16),
-                         true,
-                         this->item(row,Column::periodTime)->text().toUInt(),
-                         data);
-            framesList.append(frame);
+            item = this->item(row,i + Column::d0);
+            if(!item)
+                return;
+
+            data[i] = item->text().toUInt(nullptr, 16);
         }
+        frame.setPayload(data);
+
+    }
+        break;
+    case Column::identifier:
+    {
+        item = this->item(row, Column::identifier);
+        if(!item)
+            return;
+        frame.setFrameId(item->text().toUInt(nullptr, 16));
+
+    }
+        break;
+    case Column::periodTime:
+    {
+        item = this->item(row, Column::periodTime);
+        if(!item)
+            return;
+        frame.setPeriodic(item->checkState() == Qt::Checked ? true : false);
+        frame.setCycle(item->text().toUInt());
+
+    }
+        break;
     }
 
-    emit updatePeriodicFrames(&framesList);
+    m_frames->insert(frame.getUuid(),frame);
+
+    emit updatePeriodicFrames(&m_frames);
 }
+

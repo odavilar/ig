@@ -33,20 +33,21 @@ public:
     int busStatus();
     void disconnectDevice();
     int sendFrame(IGTableFrame * frame);
-    int updatePeriodicFrames(QList<IGTableFrame> *frames);
+    int updatePeriodicFrames(QSharedPointer<QHash<QString, IGTableFrame>> frames);
     void startMeasurement();
     void stopMeasurement();
     void errorString(QString err);
-    void getPeriodicFrames(QMultiMap<qint32, IGTableFrame> * frames);
+    void getPeriodicFrames(QSharedPointer<QMultiMap<qint32, IGTableFrame>> frames);
 
 signals:
     void stopMeasurementThread();
-    void framesUpdated(QMultiMap<qint32, IGTableFrame> *frames);
+    void framesUpdated();
 
 private:
     std::unique_ptr<QCanBusDevice> m_canDevice;
+    QThread* m_thread = nullptr;
     QList<QTimer> * m_TimerList;
-    QMultiMap<qint32, IGTableFrame> * m_PeriodicFrames;
+    QSharedPointer<QMultiMap<qint32, IGTableFrame>> m_PeriodicFrames;
     qint64 m_numberFramesWritten = 0;
     QMutex m_mutex;
 };

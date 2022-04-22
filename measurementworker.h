@@ -12,14 +12,14 @@ class MeasurementWorker : public QObject
 {
     Q_OBJECT
 public:
-    explicit MeasurementWorker(QObject *parent = nullptr);
+    explicit MeasurementWorker(QSharedPointer<QMultiMap<qint32, IGTableFrame>> *frames,QObject *parent = nullptr);
     ~MeasurementWorker();
 
 public slots:
     void process();
     void stopMeasurement();
     void timeoutExpired();
-    void framesUpdated(QMultiMap<qint32, IGTableFrame> *frames);
+    void framesUpdated();
 
 signals:
     void finished();
@@ -27,8 +27,10 @@ signals:
 
 private:
     QTimer *m_timer = nullptr;
-    QMultiMap<qint32, IGTableFrame> m_frames;
+    QSharedPointer<QMultiMap<qint32, IGTableFrame>> m_frames;
     QMutex m_mutex;
+    QMap<qint32, QList<IGTableFrame>> m_framesList;
+    QMap<qint32, QTimer> m_timerList;
 };
 
 #endif // MEASUREMENTWORKER_H

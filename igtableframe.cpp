@@ -1,7 +1,12 @@
 #include "igtableframe.h"
 #include <QDebug>
 
-IGTableFrame::IGTableFrame(qint32 identifier, bool periodic, qint32 cycle, const QByteArray &data) :  m_periodic(periodic), m_cycle(cycle)
+IGTableFrame::IGTableFrame()
+{
+
+}
+
+IGTableFrame::IGTableFrame(QUuid uuid, qint32 identifier, bool periodic, qint32 cycle, const QByteArray &data) :  m_periodic(periodic), m_cycle(cycle), m_uuid(uuid)
 {
     this->setPayload(data);
     this->setFrameId(identifier);
@@ -23,4 +28,18 @@ bool IGTableFrame::isPeriodic()
 qint32 IGTableFrame::getCycle()
 {
     return m_cycle;
+}
+
+QString IGTableFrame::getUuid()
+{
+    return m_uuid.toString(QUuid::WithoutBraces);
+}
+
+void IGTableFrame::setPeriodic(bool periodic)
+{
+    m_periodic = periodic;
+}
+
+void IGTableFrame::setCycle(qint32 cycle){
+    m_cycle = cycle;
 }

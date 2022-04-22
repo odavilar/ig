@@ -2,10 +2,10 @@
 #include "canmgr.h"
 #include <QTime>
 
-MeasurementWorker::MeasurementWorker(QObject *parent)
+MeasurementWorker::MeasurementWorker(QSharedPointer<QMultiMap<qint32, IGTableFrame>> *frames, QObject *parent)
     : QObject{parent}
 {
-
+    m_frames = *frames;
 }
 
 MeasurementWorker::~MeasurementWorker() { // Destructor
@@ -13,7 +13,6 @@ MeasurementWorker::~MeasurementWorker() { // Destructor
 }
 
 void MeasurementWorker::process() { // Process. Start processing data.
-    // allocate resources using new here
     m_timer = new QTimer(this);
     connect(m_timer, &QTimer::timeout, this, &MeasurementWorker::timeoutExpired);
     m_timer->start(1);
@@ -34,9 +33,7 @@ void MeasurementWorker::timeoutExpired()
         qDebug()<<QTime::currentTime();
 }
 
-void MeasurementWorker::framesUpdated(QMultiMap<qint32, IGTableFrame> *frames)
+void MeasurementWorker::framesUpdated()
 {
-    QMutexLocker locker(&m_mutex);
-    m_frames.clear();
-    m_frames.unite(*frames);
+   // m_frames = *frames;
 }

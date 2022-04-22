@@ -3,14 +3,23 @@
 CANMgr::CANMgr()
 {
     m_TimerList = new QList<QTimer>();
-    m_PeriodicFrames = new QMultiMap<qint32, IGTableFrame>();
+    m_PeriodicFrames = QSharedPointer<QMultiMap<qint32, IGTableFrame>>(new QMultiMap<qint32, IGTableFrame>());
+    m_thread = new QThread();
+    MeasurementWorker* worker = new MeasurementWorker(&m_PeriodicFrames);
+    worker->moveToThread(m_thread);
+    connect( worker, &MeasurementWorker::error, this, &CANMgr::errorString);
+    connect( m_thread, &QThread::started, worker, &MeasurementWorker::process);
+    connect( worker, &MeasurementWorker::finished, m_thread, &QThread::quit);
+    //connect( worker, &MeasurementWorker::finished, worker, &MeasurementWorker::deleteLater);
+    //connect( m_thread, &QThread::finished, m_thread, &QThread::deleteLater);
+    connect(this, &CANMgr::stopMeasurementThread, worker,  &MeasurementWorker::stopMeasurement);
+    connect(this, &CANMgr::framesUpdated, worker,  &MeasurementWorker::framesUpdated);
 }
 
 CANMgr::~CANMgr()
 {
     delete m_TimerList;
     m_PeriodicFrames->clear();
-    delete m_PeriodicFrames;
 }
 
 int CANMgr::connectDevice(const Settings &p, QString * resultString)
@@ -85,17 +94,16 @@ int CANMgr::sendFrame(IGTableFrame * frame)
     return 0;
 }
 
-int CANMgr::updatePeriodicFrames(QList<IGTableFrame> *frames)
+int CANMgr::updatePeriodicFrames(QSharedPointer<QHash<QString, IGTableFrame>> frames)
 {
     QMutexLocker locker(&m_mutex);
     m_PeriodicFrames->clear(); // Will it destroy all inner objects?
 
     for(auto& frame : *frames)
-        m_PeriodicFrames->insert(frame.getCycle(), frame);
+        if(frame.isPeriodic())
+            m_PeriodicFrames->insert(frame.getCycle(), frame);
 
-
-
-    emit framesUpdated(m_PeriodicFrames);
+    emit framesUpdated();
 
     locker.unlock();
 
@@ -104,17 +112,7 @@ int CANMgr::updatePeriodicFrames(QList<IGTableFrame> *frames)
 
 void CANMgr::startMeasurement()
 {
-    QThread* thread = new QThread();
-    MeasurementWorker* worker = new MeasurementWorker();
-    worker->moveToThread(thread);
-    connect( worker, &MeasurementWorker::error, this, &CANMgr::errorString);
-    connect( thread, &QThread::started, worker, &MeasurementWorker::process);
-    connect( worker, &MeasurementWorker::finished, thread, &QThread::quit);
-    connect( worker, &MeasurementWorker::finished, worker, &MeasurementWorker::deleteLater);
-    connect( thread, &QThread::finished, thread, &QThread::deleteLater);
-    connect(this, &CANMgr::stopMeasurementThread, worker,  &MeasurementWorker::stopMeasurement);
-    connect(this, &CANMgr::framesUpdated, worker,  &MeasurementWorker::framesUpdated);
-    thread->start();
+    m_thread->start();
 }
 
 void CANMgr::stopMeasurement()

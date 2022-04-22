@@ -27,7 +27,7 @@ public:
 
 public slots:
     void sendButtonClicked(IGTableFrame *frame);
-    void updatePeriodicFrames(QList<IGTableFrame> *periodicFrames);
+    void updatePeriodicFrames(QSharedPointer<QHash<QString, IGTableFrame>> *periodicFrames);
 
 private:
     Ui::MainWindow *ui;
