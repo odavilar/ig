@@ -3,7 +3,7 @@
 CANMgr::CANMgr()
 {
     m_TimerList = new QList<QTimer>();
-    m_PeriodicFrames = QSharedPointer<QMultiMap<qint32, IGTableFrame>>(new QMultiMap<qint32, IGTableFrame>());
+    m_PeriodicFrames = QSharedPointer<QMultiMap<qint32, IGFrame>>(new QMultiMap<qint32, IGFrame>());
     m_thread = new QThread();
     MeasurementWorker* worker = new MeasurementWorker(&m_PeriodicFrames);
     worker->moveToThread(m_thread);
@@ -85,7 +85,7 @@ void CANMgr::disconnectDevice()
     m_canDevice->disconnectDevice();
 }
 
-int CANMgr::sendFrame(IGTableFrame * frame)
+int CANMgr::sendFrame(IGFrame * frame)
 {
     if(!m_canDevice)
         return -1;
@@ -94,18 +94,17 @@ int CANMgr::sendFrame(IGTableFrame * frame)
     return 0;
 }
 
-int CANMgr::updatePeriodicFrames(QSharedPointer<QHash<QString, IGTableFrame>> frames)
+int CANMgr::updatePeriodicFrames(QSharedPointer<IGHash> frames)
 {
-    QMutexLocker locker(&m_mutex);
     m_PeriodicFrames->clear(); // Will it destroy all inner objects?
 
+    frames->lock();
     for(auto& frame : *frames)
         if(frame.isPeriodic())
             m_PeriodicFrames->insert(frame.getCycle(), frame);
+    frames->unlock();
 
     emit framesUpdated();
-
-    locker.unlock();
 
     return 0;
 }

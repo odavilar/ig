@@ -13,8 +13,9 @@ INCLUDEPATH += serialbus/
 SOURCES += \
     canmgr.cpp \
     deletemsgbutton.cpp \
+    igframe.cpp \
+    ighash.cpp \
     igtable.cpp \
-    igtableframe.cpp \
     main.cpp \
     mainwindow.cpp \
     measurementworker.cpp \
@@ -24,8 +25,9 @@ SOURCES += \
 HEADERS += \
     canmgr.h \
     deletemsgbutton.h \
+    igframe.h \
+    ighash.h \
     igtable.h \
-    igtableframe.h \
     mainwindow.h \
     measurementworker.h \
     serialbus/bitratebox.h \

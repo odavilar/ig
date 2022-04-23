@@ -4,8 +4,9 @@
 #include <QMainWindow>
 #include <QCanBusDevice>
 #include <QLabel>
-#include "igtableframe.h"
+#include "igframe.h"
 #include "canmgr.h"
+#include "ighash.h"
 
 class ConnectDialog;
 class IGTable;
@@ -26,8 +27,8 @@ public:
     void disconnectDevice();
 
 public slots:
-    void sendButtonClicked(IGTableFrame *frame);
-    void updatePeriodicFrames(QSharedPointer<QHash<QString, IGTableFrame>> *periodicFrames);
+    void sendButtonClicked(IGFrame *frame);
+    void updatePeriodicFrames(QSharedPointer<IGHash> *periodicFrames);
 
 private:
     Ui::MainWindow *ui;

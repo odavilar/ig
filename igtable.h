@@ -7,8 +7,9 @@
 #include <QMouseEvent>
 #include <QDebug>
 #include <QComboBox>
-#include "igtableframe.h"
 #include <QSharedPointer>
+#include "igframe.h"
+#include "ighash.h"
 
 class HexIntegerValidator : public QValidator
 {
@@ -39,8 +40,8 @@ protected:
 
 
 signals:
-    void sendButtonClicked(IGTableFrame *frame);
-    void updatePeriodicFrames(QSharedPointer<QHash<QString, IGTableFrame>> *periodicFrames);
+    void sendButtonClicked(IGFrame *frame);
+    void updatePeriodicFrames(QSharedPointer<IGHash> *periodicFrames);
 
 public slots:
     void deleteButtonClicked();
@@ -49,7 +50,7 @@ public slots:
 
 private:
     HexIntegerValidator *m_hexIntegerValidator = nullptr;
-    QSharedPointer<QHash<QString, IGTableFrame>> m_frames;
+    QSharedPointer<IGHash> m_frames;
 };
 
 

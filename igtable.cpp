@@ -184,7 +184,7 @@ IGTable::IGTable(QWidget *parent) :
     this->setSizeAdjustPolicy(QAbstractScrollArea::AdjustToContents);
     this->resizeColumnsToContents();
 
-    m_frames = QSharedPointer<QHash<QString, IGTableFrame>>(new QHash<QString, IGTableFrame>());
+    m_frames = QSharedPointer<IGHash>(new IGHash());
 
     QByteArray data;
     data.resize(8);
@@ -193,7 +193,7 @@ IGTable::IGTable(QWidget *parent) :
         data[i] = 0;
     }
 
-    m_frames->insert(uuid.toString(QUuid::WithoutBraces), IGTableFrame(uuid, itemIdentifier->text().toUInt(nullptr, 16), false, period->text().toUInt(), data));
+    m_frames->insert(uuid.toString(QUuid::WithoutBraces), IGFrame(uuid, itemIdentifier->text().toUInt(nullptr, 16), false, period->text().toUInt(), data));
 
     connect(this, SIGNAL(cellChanged(int, int)), this, SLOT(tableCellChanged(int, int)));
 }
@@ -248,7 +248,9 @@ void IGTable::setRow(int row)
         model->setData(model->index(row,i),QStringLiteral("00"));
     }
 
-    m_frames->insert(uuid.toString(QUuid::WithoutBraces), IGTableFrame(uuid, identifier.toUInt(), false, period->text().toUInt(), data));
+    m_frames->lock();
+    m_frames->insert(uuid.toString(QUuid::WithoutBraces), IGFrame(uuid, identifier.toUInt(), false, period->text().toUInt(), data));
+    m_frames->unlock();
 
     connect(deleteMsgButton, &QPushButton::clicked, this, &IGTable::deleteButtonClicked);
     connect(sendButton, &QPushButton::clicked, this, &IGTable::sendClicked);
@@ -268,7 +270,9 @@ void IGTable::deleteButtonClicked()
 
     qDebug()<<"row deleted "<<this->item(index.row(),Column::uuid)->text();
 
+    m_frames->lock();
     m_frames->remove(this->item(index.row(),Column::uuid)->text());
+    m_frames->unlock();
 
     this->removeRow(index.row());
 }
@@ -291,8 +295,8 @@ void IGTable::sendClicked()
         data[i] = this->item(index.row(),i + Column::d0)->text().toUInt(nullptr, 16);
     }
 
-    IGTableFrame * frame =
-            new IGTableFrame( QUuid(this->item(index.row(),Column::uuid)->text()),
+    IGFrame * frame =
+            new IGFrame( QUuid(this->item(index.row(),Column::uuid)->text()),
                 this->item(index.row(),Column::identifier)->text().toUInt(nullptr, 16),
                 periodic,
                 this->item(index.row(),Column::periodTime)->text().toUInt()
@@ -313,7 +317,9 @@ void IGTable::tableCellChanged(int row, int column)
     if(!item)
         return;
 
-    IGTableFrame frame = ((*m_frames).value(item->text()));
+    m_frames->lock();
+    IGFrame frame = ((*m_frames).value(item->text()));
+    m_frames->unlock();
 
     switch(column)
     {
@@ -361,7 +367,9 @@ void IGTable::tableCellChanged(int row, int column)
         break;
     }
 
+    m_frames->lock();
     m_frames->insert(frame.getUuid(),frame);
+    m_frames->unlock();
 
     emit updatePeriodicFrames(&m_frames);
 }

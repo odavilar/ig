@@ -1,18 +1,18 @@
-#include "igtableframe.h"
+#include "igframe.h"
 #include <QDebug>
 
-IGTableFrame::IGTableFrame()
+IGFrame::IGFrame()
 {
 
 }
 
-IGTableFrame::IGTableFrame(QUuid uuid, qint32 identifier, bool periodic, qint32 cycle, const QByteArray &data) :  m_periodic(periodic), m_cycle(cycle), m_uuid(uuid)
+IGFrame::IGFrame(QUuid uuid, qint32 identifier, bool periodic, qint32 cycle, const QByteArray &data) :  m_periodic(periodic), m_cycle(cycle), m_uuid(uuid)
 {
     this->setPayload(data);
     this->setFrameId(identifier);
 }
 
-void IGTableFrame::print()
+void IGFrame::print()
 {
     qDebug()<<"Identifier: "<< QString::number( this->frameId(), 16 ).toUpper();
     qDebug()<<"Periodic: "<<m_periodic;
@@ -20,26 +20,26 @@ void IGTableFrame::print()
     qDebug()<<"Data: "<< this->payload().toHex();
 }
 
-bool IGTableFrame::isPeriodic()
+bool IGFrame::isPeriodic()
 {
     return m_periodic;
 }
 
-qint32 IGTableFrame::getCycle()
+qint32 IGFrame::getCycle()
 {
     return m_cycle;
 }
 
-QString IGTableFrame::getUuid()
+QString IGFrame::getUuid()
 {
     return m_uuid.toString(QUuid::WithoutBraces);
 }
 
-void IGTableFrame::setPeriodic(bool periodic)
+void IGFrame::setPeriodic(bool periodic)
 {
     m_periodic = periodic;
 }
 
-void IGTableFrame::setCycle(qint32 cycle){
+void IGFrame::setCycle(qint32 cycle){
     m_cycle = cycle;
 }

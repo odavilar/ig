@@ -2,7 +2,7 @@
 #include "canmgr.h"
 #include <QTime>
 
-MeasurementWorker::MeasurementWorker(QSharedPointer<QMultiMap<qint32, IGTableFrame>> *frames, QObject *parent)
+MeasurementWorker::MeasurementWorker(QSharedPointer<QMultiMap<qint32, IGFrame>> *frames, QObject *parent)
     : QObject{parent}
 {
     m_frames = *frames;
