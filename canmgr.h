@@ -14,7 +14,6 @@
 #include "igframe.h"
 #include "ighash.h"
 #include "measurementworker.h"
-#include "periodicframesmap.h"
 
 class CANMgr : public QObject
 {
@@ -35,16 +34,14 @@ public:
     int busStatus();
     void disconnectDevice();
     int sendFrame(IGFrame * frame);
-    int updatePeriodicFrames(QSharedPointer<IGHash> frames);
     void startMeasurement();
     void stopMeasurement();
     void errorString(QString err);
 
 signals:
     void stopMeasurementThread();
-    void framesUpdated();
     void frameUpdated(QString uuid);
-    void frameDeleted(QString uuid);
+    void frameDeleted(QString uuid, qint32 period);
 
 public slots:
     void updateFrame(IGFrame frame);
@@ -53,10 +50,8 @@ public slots:
 private:
     std::unique_ptr<QCanBusDevice> m_canDevice;
     QThread* m_thread = nullptr;
-    QList<QTimer> * m_TimerList;
     QSharedPointer<IGHash> m_PeriodicFrames;
     qint64 m_numberFramesWritten = 0;
-    QMutex m_mutex;
 };
 
 #endif // CANMGR_H

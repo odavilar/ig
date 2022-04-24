@@ -70,9 +70,7 @@ void MainWindow::initConnections()
         m_canmgr->stopMeasurement();
     });
 
-    connect(m_igTable, SIGNAL(sendButtonClicked(IGFrame*)), this, SLOT(sendButtonClicked(IGFrame*)));
-
-    connect(m_igTable, SIGNAL(updatePeriodicFrames(QSharedPointer<IGHash>*)), this, SLOT(updatePeriodicFrames(QSharedPointer<IGHash>*)));
+    connect(m_igTable, SIGNAL(sendButtonClicked(IGFrame*)), m_canmgr, SLOT(sendFrame(IGFrame*)));
     connect(m_igTable, SIGNAL(updateFrame(IGFrame)), m_canmgr, SLOT(updateFrame(IGFrame)));
     connect(m_igTable, SIGNAL(deleteFrame(QString)), m_canmgr, SLOT(deleteFrame(QString)));
 }
@@ -98,15 +96,4 @@ void MainWindow::disconnectDevice()
 {
     m_canmgr->disconnectDevice();
     m_status->setText(tr("Disconnected"));
-}
-
-void MainWindow::sendButtonClicked(IGFrame *frame)
-{
-    frame->print();
-    m_canmgr->sendFrame(frame);
-}
-
-void MainWindow::updatePeriodicFrames(QSharedPointer<IGHash> *periodicFrames)
-{
-    m_canmgr->updatePeriodicFrames(*periodicFrames);
 }

@@ -1,6 +1,7 @@
 #include "measurementworker.h"
 #include "canmgr.h"
 #include <QTime>
+#include <QList>
 
 MeasurementWorker::MeasurementWorker(QSharedPointer<IGHash> *frames, QObject *parent)
     : QObject{parent}
@@ -13,40 +14,91 @@ MeasurementWorker::~MeasurementWorker() { // Destructor
 }
 
 void MeasurementWorker::process() { // Process. Start processing data.
-    m_timer = new QTimer(this);
-    connect(m_timer, &QTimer::timeout, this, &MeasurementWorker::timeoutExpired);
-    m_timer->start(1);
+
+    qint32 period = 0;
+
+    for(auto& frame: *m_PeriodicFrames)
+    {
+        period = frame.getPeriod();
+        if(!m_TimerList.contains(period))
+            m_TimerList.insert(period, new QTimer(this));
+
+        if(!m_FramesList.contains(period))
+        {
+            QList<QString> * list = new QList<QString>();
+            list->append(frame.getUuid());
+            m_FramesList.insert(period, list);
+        }
+        else
+        {
+            QList<QString> * list = m_FramesList.value(period);
+            if(!list->contains(frame.getUuid()))
+                list->append(frame.getUuid());
+        }
+    }
+
+    QHashIterator<qint32, QTimer*> i(m_TimerList);
+    while (i.hasNext()) {
+        i.next();
+        qDebug()<< "Starting timer with period "<< i.key();
+        i.value()->start(i.key());
+        connect(i.value(), &QTimer::timeout, this, &MeasurementWorker::timeoutExpired);
+    }
 }
 
 
 void MeasurementWorker::stopMeasurement()
 {
-    m_timer->stop();
-    delete m_timer;
+    QHashIterator<qint32, QTimer*> i(m_TimerList);
+    while (i.hasNext()) {
+        i.next();
+        QTimer * timer = i.value();
+        timer->stop();
+        delete timer;
+    }
+
+    m_TimerList.clear();
+
     emit finished();
 }
 
 void MeasurementWorker::timeoutExpired()
 {
-    static int count = 0;
-    if(++count % 1000 == 0)
-    {
-        qDebug()<<QTime::currentTime();
-        m_PeriodicFrames->lock();
-        for(auto& frame: *m_PeriodicFrames)
-        {
-            qDebug()<<frame.toString();
-        }
-        m_PeriodicFrames->unlock();
-    }
-}
+    QTimer *timer = dynamic_cast<QTimer*>(QObject::sender());
+    int period = timer->interval();
+    QString debugPrint;
+    QList<QString> * list = m_FramesList.value(period);
 
-void MeasurementWorker::framesUpdated()
-{
+    debugPrint = QTime::currentTime().toString("hh:mm:ss.zzz") + " Period: " + QString::number(period);
+
+    for(auto& uuid: *list)
+    {
+        if(m_PeriodicFrames->contains(uuid))
+        {
+            IGFrame frame = m_PeriodicFrames->value(uuid);
+            debugPrint = debugPrint + " : " + QString::number(frame.frameId(), 16);
+        }
+    }
+
+    qDebug()<<debugPrint;
 }
 
 void MeasurementWorker::frameUpdated(QString uuid)
-{}
+{
 
-void MeasurementWorker::frameDeleted(QString uuid)
-{}
+}
+
+void MeasurementWorker::frameDeleted(QString uuid, qint32 period)
+{
+    QList<QString> * list = m_FramesList.value(period);
+    list->removeOne(uuid);
+    if(list->empty())
+    {
+        QTimer * timer = m_TimerList.value(period);
+        timer->stop();
+        delete timer;
+        m_TimerList.remove(period);
+        delete list;
+        m_FramesList.remove(period);
+    }
+}

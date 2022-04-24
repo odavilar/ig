@@ -26,10 +26,6 @@ public:
     void busStatus();
     void disconnectDevice();
 
-public slots:
-    void sendButtonClicked(IGFrame *frame);
-    void updatePeriodicFrames(QSharedPointer<IGHash> *periodicFrames);
-
 private:
     Ui::MainWindow *ui;
     ConnectDialog *m_connectDialog = nullptr;

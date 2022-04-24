@@ -12,7 +12,7 @@ public:
     explicit IGFrame(QUuid uuid, qint32 identifier, bool periodic, qint32 cycle, const QByteArray &data);
     void print();
     bool isPeriodic();
-    qint32 getCycle();
+    qint32 getPeriod() const;
     QString getUuid() const;
     void setPeriodic(bool periodic);
     void setCycle(qint32 cycle);

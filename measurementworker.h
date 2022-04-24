@@ -12,6 +12,9 @@
 class MeasurementWorker : public QObject
 {
     Q_OBJECT
+
+    using period = qint32;
+
 public:
     explicit MeasurementWorker(QSharedPointer<IGHash> *frames,QObject *parent = nullptr);
     ~MeasurementWorker();
@@ -20,19 +23,17 @@ public slots:
     void process();
     void stopMeasurement();
     void timeoutExpired();
-    void framesUpdated();
     void frameUpdated(QString uuid);
-    void frameDeleted(QString uuid);
+    void frameDeleted(QString uuid, qint32 period);
 
 signals:
     void finished();
     void error(QString err);
 
 private:
-    QTimer *m_timer = nullptr;
     QSharedPointer<IGHash> m_PeriodicFrames;
-    QMutex m_mutex;
-    QMap<qint32, QTimer> m_timerList;
+    QHash<period, QTimer*> m_TimerList;
+    QHash<period, QList<QString>*> m_FramesList;
 };
 
 #endif // MEASUREMENTWORKER_H

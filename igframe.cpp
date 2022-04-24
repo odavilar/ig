@@ -25,7 +25,7 @@ bool IGFrame::isPeriodic()
     return m_periodic;
 }
 
-qint32 IGFrame::getCycle()
+qint32 IGFrame::getPeriod() const
 {
     return m_cycle;
 }

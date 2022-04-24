@@ -291,7 +291,7 @@ void IGTable::sendClicked()
 
     qDebug()<<__FUNCTION__<<index.row();
 
-    if(this->item(index.row(),4)->checkState() == Qt::Checked)
+    if(this->item(index.row(),Column::periodTime)->checkState() == Qt::Checked)
         periodic = true;
 
     QByteArray data;
@@ -307,7 +307,7 @@ void IGTable::sendClicked()
                 periodic,
                 this->item(index.row(),Column::periodTime)->text().toUInt()
                 ,data);
-    //frame->print();
+
     emit sendButtonClicked(frame);
 
     delete frame;
@@ -316,7 +316,7 @@ void IGTable::sendClicked()
 
 void IGTable::tableCellChanged(int row, int column)
 {
-    //qDebug()<<"row "<<row<<" column "<<column;
+
     QTableWidgetItem * item = nullptr;
 
     item = this->item(row, Column::uuid);
@@ -377,7 +377,6 @@ void IGTable::tableCellChanged(int row, int column)
     m_frames->insert(frame.getUuid(),frame);
     m_frames->unlock();
 
-    //emit updatePeriodicFrames(&m_frames);
     emit updateFrame(frame);
 }
 
