@@ -7,12 +7,13 @@
 #include <QMutex>
 
 #include "igframe.h"
+#include "ighash.h"
 
 class MeasurementWorker : public QObject
 {
     Q_OBJECT
 public:
-    explicit MeasurementWorker(QSharedPointer<QMultiMap<qint32, IGFrame>> *frames,QObject *parent = nullptr);
+    explicit MeasurementWorker(QSharedPointer<IGHash> *frames,QObject *parent = nullptr);
     ~MeasurementWorker();
 
 public slots:
@@ -20,6 +21,8 @@ public slots:
     void stopMeasurement();
     void timeoutExpired();
     void framesUpdated();
+    void frameUpdated(QString uuid);
+    void frameDeleted(QString uuid);
 
 signals:
     void finished();
@@ -27,9 +30,8 @@ signals:
 
 private:
     QTimer *m_timer = nullptr;
-    QSharedPointer<QMultiMap<qint32, IGFrame>> m_frames;
+    QSharedPointer<IGHash> m_PeriodicFrames;
     QMutex m_mutex;
-    QMap<qint32, QList<IGFrame>> m_framesList;
     QMap<qint32, QTimer> m_timerList;
 };
 

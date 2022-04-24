@@ -73,6 +73,8 @@ void MainWindow::initConnections()
     connect(m_igTable, SIGNAL(sendButtonClicked(IGFrame*)), this, SLOT(sendButtonClicked(IGFrame*)));
 
     connect(m_igTable, SIGNAL(updatePeriodicFrames(QSharedPointer<IGHash>*)), this, SLOT(updatePeriodicFrames(QSharedPointer<IGHash>*)));
+    connect(m_igTable, SIGNAL(updateFrame(IGFrame)), m_canmgr, SLOT(updateFrame(IGFrame)));
+    connect(m_igTable, SIGNAL(deleteFrame(QString)), m_canmgr, SLOT(deleteFrame(QString)));
 }
 
 void MainWindow::connectDevice()

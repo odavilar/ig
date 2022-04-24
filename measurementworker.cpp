@@ -2,10 +2,10 @@
 #include "canmgr.h"
 #include <QTime>
 
-MeasurementWorker::MeasurementWorker(QSharedPointer<QMultiMap<qint32, IGFrame>> *frames, QObject *parent)
+MeasurementWorker::MeasurementWorker(QSharedPointer<IGHash> *frames, QObject *parent)
     : QObject{parent}
 {
-    m_frames = *frames;
+    m_PeriodicFrames = *frames;
 }
 
 MeasurementWorker::~MeasurementWorker() { // Destructor
@@ -30,10 +30,23 @@ void MeasurementWorker::timeoutExpired()
 {
     static int count = 0;
     if(++count % 1000 == 0)
+    {
         qDebug()<<QTime::currentTime();
+        m_PeriodicFrames->lock();
+        for(auto& frame: *m_PeriodicFrames)
+        {
+            qDebug()<<frame.toString();
+        }
+        m_PeriodicFrames->unlock();
+    }
 }
 
 void MeasurementWorker::framesUpdated()
 {
-   // m_frames = *frames;
 }
+
+void MeasurementWorker::frameUpdated(QString uuid)
+{}
+
+void MeasurementWorker::frameDeleted(QString uuid)
+{}

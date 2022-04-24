@@ -3,7 +3,7 @@
 CANMgr::CANMgr()
 {
     m_TimerList = new QList<QTimer>();
-    m_PeriodicFrames = QSharedPointer<QMultiMap<qint32, IGFrame>>(new QMultiMap<qint32, IGFrame>());
+    m_PeriodicFrames = QSharedPointer<IGHash>(new IGHash());
     m_thread = new QThread();
     MeasurementWorker* worker = new MeasurementWorker(&m_PeriodicFrames);
     worker->moveToThread(m_thread);
@@ -13,7 +13,9 @@ CANMgr::CANMgr()
     //connect( worker, &MeasurementWorker::finished, worker, &MeasurementWorker::deleteLater);
     //connect( m_thread, &QThread::finished, m_thread, &QThread::deleteLater);
     connect(this, &CANMgr::stopMeasurementThread, worker,  &MeasurementWorker::stopMeasurement);
-    connect(this, &CANMgr::framesUpdated, worker,  &MeasurementWorker::framesUpdated);
+    //connect(this, &CANMgr::framesUpdated, worker,  &MeasurementWorker::framesUpdated);
+    connect(this, &CANMgr::frameUpdated, worker,  &MeasurementWorker::frameUpdated);
+    connect(this, &CANMgr::frameDeleted, worker,  &MeasurementWorker::frameDeleted);
 }
 
 CANMgr::~CANMgr()
@@ -96,17 +98,40 @@ int CANMgr::sendFrame(IGFrame * frame)
 
 int CANMgr::updatePeriodicFrames(QSharedPointer<IGHash> frames)
 {
-    m_PeriodicFrames->clear(); // Will it destroy all inner objects?
+    m_PeriodicFrames->lock();
+    m_PeriodicFrames->clear(); // TODO: Only update the modified frame
 
     frames->lock();
     for(auto& frame : *frames)
         if(frame.isPeriodic())
-            m_PeriodicFrames->insert(frame.getCycle(), frame);
+            m_PeriodicFrames->insert(frame.getUuid(), frame);
     frames->unlock();
+    m_PeriodicFrames->unlock();
 
-    emit framesUpdated();
+//    emit framesUpdated();
 
     return 0;
+}
+
+void CANMgr::updateFrame(IGFrame frame)
+{
+    m_PeriodicFrames->lock();
+    if(frame.isPeriodic())
+        m_PeriodicFrames->insert(frame.getUuid(), frame);
+    m_PeriodicFrames->unlock();
+
+     emit frameUpdated(frame.getUuid());
+}
+
+void CANMgr::deleteFrame(QString uuid)
+{
+    m_PeriodicFrames->lock();
+
+    if(!m_PeriodicFrames->remove(uuid))
+        qDebug()<<"Error deleting";
+    m_PeriodicFrames->unlock();
+
+    emit frameDeleted(uuid);
 }
 
 void CANMgr::startMeasurement()

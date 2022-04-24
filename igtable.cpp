@@ -200,7 +200,7 @@ IGTable::IGTable(QWidget *parent) :
 
 void IGTable::mouseDoubleClickEvent(QMouseEvent *event)
 {
-    qDebug()<<__FUNCTION__<<this->indexAt(event->pos()).isValid();
+   //qDebug()<<__FUNCTION__<<this->indexAt(event->pos()).isValid();
    if(!this->indexAt(event->pos()).isValid())
    {
        this->addRow();
@@ -248,9 +248,13 @@ void IGTable::setRow(int row)
         model->setData(model->index(row,i),QStringLiteral("00"));
     }
 
+    IGFrame newFrame = IGFrame(uuid, identifier.toUInt(), false, period->text().toUInt(), data);
+
     m_frames->lock();
-    m_frames->insert(uuid.toString(QUuid::WithoutBraces), IGFrame(uuid, identifier.toUInt(), false, period->text().toUInt(), data));
+    m_frames->insert(uuid.toString(QUuid::WithoutBraces), newFrame);
     m_frames->unlock();
+
+    emit updateFrame(newFrame);
 
     connect(deleteMsgButton, &QPushButton::clicked, this, &IGTable::deleteButtonClicked);
     connect(sendButton, &QPushButton::clicked, this, &IGTable::sendClicked);
@@ -269,6 +273,8 @@ void IGTable::deleteButtonClicked()
     QModelIndex index = this->indexAt(button->pos());
 
     qDebug()<<"row deleted "<<this->item(index.row(),Column::uuid)->text();
+
+    emit deleteFrame(this->item(index.row(),Column::uuid)->text());
 
     m_frames->lock();
     m_frames->remove(this->item(index.row(),Column::uuid)->text());
@@ -310,7 +316,7 @@ void IGTable::sendClicked()
 
 void IGTable::tableCellChanged(int row, int column)
 {
-    qDebug()<<"row "<<row<<" column "<<column;
+    //qDebug()<<"row "<<row<<" column "<<column;
     QTableWidgetItem * item = nullptr;
 
     item = this->item(row, Column::uuid);
@@ -371,6 +377,9 @@ void IGTable::tableCellChanged(int row, int column)
     m_frames->insert(frame.getUuid(),frame);
     m_frames->unlock();
 
-    emit updatePeriodicFrames(&m_frames);
+    //emit updatePeriodicFrames(&m_frames);
+    emit updateFrame(frame);
 }
+
+
 

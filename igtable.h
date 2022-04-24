@@ -42,6 +42,8 @@ protected:
 signals:
     void sendButtonClicked(IGFrame *frame);
     void updatePeriodicFrames(QSharedPointer<IGHash> *periodicFrames);
+    void updateFrame(IGFrame frame);
+    void deleteFrame(QString uuid);
 
 public slots:
     void deleteButtonClicked();

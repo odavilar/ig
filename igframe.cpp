@@ -30,7 +30,7 @@ qint32 IGFrame::getCycle()
     return m_cycle;
 }
 
-QString IGFrame::getUuid()
+QString IGFrame::getUuid() const
 {
     return m_uuid.toString(QUuid::WithoutBraces);
 }
