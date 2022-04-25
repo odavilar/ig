@@ -9,13 +9,13 @@ class IGFrame : public QCanBusFrame
 {
 public:
     IGFrame();
-    explicit IGFrame(QUuid uuid, qint32 identifier, bool periodic, qint32 cycle, const QByteArray &data);
+    explicit IGFrame(QUuid uuid, quint32 identifier, bool periodic, quint32 period, const QByteArray &data);
     void print();
     bool isPeriodic();
-    qint32 getPeriod() const;
+    quint32 getPeriod() const;
     QString getUuid() const;
     void setPeriodic(bool periodic);
-    void setCycle(qint32 cycle);
+    void setPeriod(quint32 period);
 
     bool operator==(const IGFrame& rhs)
     {
@@ -26,10 +26,8 @@ public:
 
 private:
     bool m_periodic = false;
-    qint32 m_cycle = 0;
+    quint32 m_period = 0;
     QUuid m_uuid;
-
-
 };
 
 #endif // IGFRAME_H

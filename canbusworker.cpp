@@ -17,9 +17,13 @@ void CANBusWorker::process() { // Process. Start processing data.
 
     qint32 period = 0;
     m_isRunning = true;
+    QMutexLocker mutex(m_PeriodicFrames->getMutex());
     for(auto& frame: *m_PeriodicFrames)
     {
         period = frame.getPeriod();
+        if(period == 0)
+            continue;
+
         if(!m_TimerList.contains(period))
             m_TimerList.insert(period, new QTimer(this));
 
@@ -74,6 +78,7 @@ void CANBusWorker::timeoutExpired()
 
     for(auto& uuid: *list)
     {
+        QMutexLocker mutex(m_PeriodicFrames->getMutex());
         if(m_PeriodicFrames->contains(uuid))
         {
             IGFrame frame = m_PeriodicFrames->value(uuid);
@@ -88,6 +93,7 @@ void CANBusWorker::frameUpdated(QString uuid)
 {
     QTimer * timer = nullptr;
 
+    QMutexLocker mutex(m_PeriodicFrames->getMutex());
     if(m_PeriodicFrames->contains(uuid))
     {
         if(this->isRunning())

@@ -16,7 +16,7 @@ class CANBusWorker : public QObject
     using period = qint32;
 
 public:
-    explicit CANBusWorker(QSharedPointer<IGHash> *frames,QObject *parent = nullptr);
+    explicit CANBusWorker(QSharedPointer<IGHash> *frames, QObject *parent = nullptr);
     ~CANBusWorker();
 
 public slots:

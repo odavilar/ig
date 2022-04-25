@@ -215,7 +215,7 @@ void IGTable::mouseDoubleClickEvent(QMouseEvent *event)
 void IGTable::setRow(int row)
 {
     DeleteMsgButton *deleteMsgButton = new DeleteMsgButton();
-    QTableWidgetItem *period = new QTableWidgetItem("0");
+    QTableWidgetItem *period = new QTableWidgetItem("1000");
     QComboBox * comboBox = new QComboBox();
     QPushButton * sendButton = new QPushButton("Send");
     QUuid uuid;
@@ -367,7 +367,7 @@ void IGTable::tableCellChanged(int row, int column)
         if(!item)
             return;
         frame.setPeriodic(item->checkState() == Qt::Checked ? true : false);
-        frame.setCycle(item->text().toUInt());
+        frame.setPeriod(item->text().toUInt());
 
     }
         break;
