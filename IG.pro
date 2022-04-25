@@ -11,25 +11,25 @@ CONFIG += c++11
 INCLUDEPATH += serialbus/
 
 SOURCES += \
-    canmgr.cpp \
+    canbusmgr.cpp \
+    canbusworker.cpp \
     deletemsgbutton.cpp \
     igframe.cpp \
     ighash.cpp \
     igtable.cpp \
     main.cpp \
     mainwindow.cpp \
-    measurementworker.cpp \
     serialbus/bitratebox.cpp \
     serialbus/connectdialog.cpp
 
 HEADERS += \
-    canmgr.h \
+    canbusmgr.h \
+    canbusworker.h \
     deletemsgbutton.h \
     igframe.h \
     ighash.h \
     igtable.h \
     mainwindow.h \
-    measurementworker.h \
     serialbus/bitratebox.h \
     serialbus/connectdialog.h
 

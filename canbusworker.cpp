@@ -1,19 +1,19 @@
-#include "measurementworker.h"
-#include "canmgr.h"
+#include "canbusworker.h"
+#include "canbusmgr.h"
 #include <QTime>
 #include <QList>
 
-MeasurementWorker::MeasurementWorker(QSharedPointer<IGHash> *frames, QObject *parent)
+CANBusWorker::CANBusWorker(QSharedPointer<IGHash> *frames, QObject *parent)
     : QObject{parent}, m_isRunning(false)
 {
     m_PeriodicFrames = *frames;
 }
 
-MeasurementWorker::~MeasurementWorker() { // Destructor
+CANBusWorker::~CANBusWorker() { // Destructor
     // free resources
 }
 
-void MeasurementWorker::process() { // Process. Start processing data.
+void CANBusWorker::process() { // Process. Start processing data.
 
     qint32 period = 0;
     m_isRunning = true;
@@ -42,12 +42,12 @@ void MeasurementWorker::process() { // Process. Start processing data.
         i.next();
         qDebug()<< "Starting timer with period "<< i.key();
         i.value()->start(i.key());
-        connect(i.value(), &QTimer::timeout, this, &MeasurementWorker::timeoutExpired);
+        connect(i.value(), &QTimer::timeout, this, &CANBusWorker::timeoutExpired);
     }
 }
 
 
-void MeasurementWorker::stopMeasurement()
+void CANBusWorker::stopMeasurement()
 {
     m_isRunning = false;
     QHashIterator<qint32, QTimer*> i(m_TimerList);
@@ -63,7 +63,7 @@ void MeasurementWorker::stopMeasurement()
     emit finished();
 }
 
-void MeasurementWorker::timeoutExpired()
+void CANBusWorker::timeoutExpired()
 {
     QTimer *timer = dynamic_cast<QTimer*>(QObject::sender());
     int period = timer->interval();
@@ -84,7 +84,7 @@ void MeasurementWorker::timeoutExpired()
     qDebug()<<debugPrint;
 }
 
-void MeasurementWorker::frameUpdated(QString uuid)
+void CANBusWorker::frameUpdated(QString uuid)
 {
     QTimer * timer = nullptr;
 
@@ -102,7 +102,7 @@ void MeasurementWorker::frameUpdated(QString uuid)
                 timer = new QTimer(this);
                 m_TimerList.insert(period, timer);
                 timer->start(period);
-                connect(timer, &QTimer::timeout, this, &MeasurementWorker::timeoutExpired);
+                connect(timer, &QTimer::timeout, this, &CANBusWorker::timeoutExpired);
             }
 
             if(!m_FramesList.contains(period))
@@ -121,7 +121,7 @@ void MeasurementWorker::frameUpdated(QString uuid)
     }
 }
 
-void MeasurementWorker::frameDeleted(QString uuid, qint32 period)
+void CANBusWorker::frameDeleted(QString uuid, qint32 period)
 {
     QList<QString> * list = m_FramesList.value(period);
     if(!list)
@@ -140,7 +140,7 @@ void MeasurementWorker::frameDeleted(QString uuid, qint32 period)
 }
 
 
-bool MeasurementWorker::isRunning()
+bool CANBusWorker::isRunning()
 {
     return m_isRunning;
 }

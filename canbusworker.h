@@ -1,5 +1,5 @@
-#ifndef MEASUREMENTWORKER_H
-#define MEASUREMENTWORKER_H
+#ifndef CANBUSWORKER_H
+#define CANBUSWORKER_H
 
 #include <QObject>
 #include <QTimer>
@@ -9,15 +9,15 @@
 #include "igframe.h"
 #include "ighash.h"
 
-class MeasurementWorker : public QObject
+class CANBusWorker : public QObject
 {
     Q_OBJECT
 
     using period = qint32;
 
 public:
-    explicit MeasurementWorker(QSharedPointer<IGHash> *frames,QObject *parent = nullptr);
-    ~MeasurementWorker();
+    explicit CANBusWorker(QSharedPointer<IGHash> *frames,QObject *parent = nullptr);
+    ~CANBusWorker();
 
 public slots:
     void process();
@@ -38,4 +38,4 @@ private:
     bool m_isRunning;
 };
 
-#endif // MEASUREMENTWORKER_H
+#endif // CANBUSWORKER_H

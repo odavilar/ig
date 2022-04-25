@@ -1,5 +1,5 @@
-#ifndef CANMGR_H
-#define CANMGR_H
+#ifndef CANBUSMGR_H
+#define CANBUSMGR_H
 
 #include <QObject>
 #include <QTimer>
@@ -13,9 +13,9 @@
 #include <memory>
 #include "igframe.h"
 #include "ighash.h"
-#include "measurementworker.h"
+#include "canbusworker.h"
 
-class CANMgr : public QObject
+class CANBusMgr : public QObject
 {
     Q_OBJECT
 public:
@@ -28,8 +28,8 @@ public:
         bool useConfigurationEnabled = false;
     };
 
-    CANMgr();
-    ~CANMgr();
+    CANBusMgr();
+    ~CANBusMgr();
     int connectDevice(const Settings &p, QString * resultString);
     int busStatus();
     void disconnectDevice();
@@ -55,4 +55,4 @@ private:
     qint64 m_numberFramesWritten = 0;
 };
 
-#endif // CANMGR_H
+#endif // CANBUSMGR_H

@@ -21,7 +21,7 @@ MainWindow::MainWindow(QWidget *parent)
     m_igTable = new IGTable(this);
     this->setCentralWidget(m_igTable);
 
-    m_canmgr = new CANMgr();
+    m_canmgr = new CANBusMgr();
 
     m_connectDialog = new ConnectDialog;
 
@@ -80,7 +80,7 @@ void MainWindow::connectDevice()
     QString resultString;
 
     const ConnectDialog::Settings p = m_connectDialog->settings();
-    CANMgr::Settings canSettings;
+    CANBusMgr::Settings canSettings;
 \
     canSettings.configurations.append(p.configurations);
     canSettings.deviceInterfaceName = p.deviceInterfaceName;

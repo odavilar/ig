@@ -5,7 +5,7 @@
 #include <QCanBusDevice>
 #include <QLabel>
 #include "igframe.h"
-#include "canmgr.h"
+#include "canbusmgr.h"
 #include "ighash.h"
 
 class ConnectDialog;
@@ -39,7 +39,7 @@ private:
     QLabel *m_written = nullptr;
     std::unique_ptr<QCanBusDevice> m_canDevice;
     QTimer *m_busStatusTimer = nullptr;
-    CANMgr * m_canmgr = nullptr;
+    CANBusMgr * m_canmgr = nullptr;
 
     void initConnections();
 

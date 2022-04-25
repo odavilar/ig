@@ -1,28 +1,28 @@
-#include "canmgr.h"
+#include "canbusmgr.h"
 
-CANMgr::CANMgr()
+CANBusMgr::CANBusMgr()
 {
     m_PeriodicFrames = QSharedPointer<IGHash>(new IGHash());
     m_thread = new QThread();
-    MeasurementWorker* worker = new MeasurementWorker(&m_PeriodicFrames);
+    CANBusWorker* worker = new CANBusWorker(&m_PeriodicFrames);
     worker->moveToThread(m_thread);
-    connect( worker, &MeasurementWorker::error, this, &CANMgr::errorString);
-    connect( m_thread, &QThread::started, worker, &MeasurementWorker::process);
-    connect( worker, &MeasurementWorker::finished, m_thread, &QThread::quit);
+    connect( worker, &CANBusWorker::error, this, &CANBusMgr::errorString);
+    connect( m_thread, &QThread::started, worker, &CANBusWorker::process);
+    connect( worker, &CANBusWorker::finished, m_thread, &QThread::quit);
     //connect( worker, &MeasurementWorker::finished, worker, &MeasurementWorker::deleteLater);
     //connect( m_thread, &QThread::finished, m_thread, &QThread::deleteLater);
-    connect(this, &CANMgr::stopMeasurementThread, worker,  &MeasurementWorker::stopMeasurement);
+    connect(this, &CANBusMgr::stopMeasurementThread, worker,  &CANBusWorker::stopMeasurement);
     //connect(this, &CANMgr::framesUpdated, worker,  &MeasurementWorker::framesUpdated);
-    connect(this, &CANMgr::frameUpdated, worker,  &MeasurementWorker::frameUpdated);
-    connect(this, &CANMgr::frameDeleted, worker,  &MeasurementWorker::frameDeleted);
+    connect(this, &CANBusMgr::frameUpdated, worker,  &CANBusWorker::frameUpdated);
+    connect(this, &CANBusMgr::frameDeleted, worker,  &CANBusWorker::frameDeleted);
 }
 
-CANMgr::~CANMgr()
+CANBusMgr::~CANBusMgr()
 {
     m_PeriodicFrames->clear();
 }
 
-int CANMgr::connectDevice(const Settings &p, QString * resultString)
+int CANBusMgr::connectDevice(const Settings &p, QString * resultString)
 {
     int error = 0;
     QString errorString;
@@ -37,7 +37,7 @@ int CANMgr::connectDevice(const Settings &p, QString * resultString)
     m_numberFramesWritten = 0;
 
     if (p.useConfigurationEnabled) {
-        for (const CANMgr::ConfigurationItem &item : p.configurations)
+        for (const CANBusMgr::ConfigurationItem &item : p.configurations)
             m_canDevice->setConfigurationParameter(item.first, item.second);
     }
 
@@ -72,12 +72,12 @@ int CANMgr::connectDevice(const Settings &p, QString * resultString)
     return error;
 }
 
-int CANMgr::busStatus()
+int CANBusMgr::busStatus()
 {
     return 0;
 }
 
-void CANMgr::disconnectDevice()
+void CANBusMgr::disconnectDevice()
 {
     if (!m_canDevice)
         return;
@@ -85,7 +85,7 @@ void CANMgr::disconnectDevice()
     m_canDevice->disconnectDevice();
 }
 
-int CANMgr::sendFrame(IGFrame * frame)
+int CANBusMgr::sendFrame(IGFrame * frame)
 {
     if(!m_canDevice)
         return -1;
@@ -94,7 +94,7 @@ int CANMgr::sendFrame(IGFrame * frame)
     return 0;
 }
 
-void CANMgr::updateFrame(IGFrame frame)
+void CANBusMgr::updateFrame(IGFrame frame)
 {
     if(frame.isPeriodic())
     {
@@ -110,7 +110,7 @@ void CANMgr::updateFrame(IGFrame frame)
 
 }
 
-void CANMgr::deleteFrame(QString uuid)
+void CANBusMgr::deleteFrame(QString uuid)
 {
     QMutexLocker mutex(m_PeriodicFrames->getMutex());
     qint32 period = m_PeriodicFrames->value(uuid).getPeriod();
@@ -119,22 +119,22 @@ void CANMgr::deleteFrame(QString uuid)
     emit frameDeleted(uuid, period);
 }
 
-void CANMgr::startMeasurement()
+void CANBusMgr::startMeasurement()
 {
     m_thread->start();
 }
 
-void CANMgr::stopMeasurement()
+void CANBusMgr::stopMeasurement()
 {
     emit stopMeasurementThread();
 }
 
-void CANMgr::errorString(QString err)
+void CANBusMgr::errorString(QString err)
 {
     qCritical()<<err;
 }
 
-bool CANMgr::isRunning()
+bool CANBusMgr::isRunning()
 {
     return m_thread->isRunning();
 }
