@@ -25,6 +25,7 @@ public slots:
     void timeoutExpired();
     void frameUpdated(QString uuid);
     void frameDeleted(QString uuid, qint32 period);
+    bool isRunning();
 
 signals:
     void finished();
@@ -34,6 +35,7 @@ private:
     QSharedPointer<IGHash> m_PeriodicFrames;
     QHash<period, QTimer*> m_TimerList;
     QHash<period, QList<QString>*> m_FramesList;
+    bool m_isRunning;
 };
 
 #endif // MEASUREMENTWORKER_H

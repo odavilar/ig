@@ -133,3 +133,8 @@ void CANMgr::errorString(QString err)
 {
     qCritical()<<err;
 }
+
+bool CANMgr::isRunning()
+{
+    return m_thread->isRunning();
+}

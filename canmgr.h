@@ -33,10 +33,10 @@ public:
     int connectDevice(const Settings &p, QString * resultString);
     int busStatus();
     void disconnectDevice();
-    int sendFrame(IGFrame * frame);
     void startMeasurement();
     void stopMeasurement();
     void errorString(QString err);
+    bool isRunning();
 
 signals:
     void stopMeasurementThread();
@@ -46,6 +46,7 @@ signals:
 public slots:
     void updateFrame(IGFrame frame);
     void deleteFrame(QString uuid);
+    int sendFrame(IGFrame * frame);
 
 private:
     std::unique_ptr<QCanBusDevice> m_canDevice;
