@@ -99,8 +99,9 @@ void CANBusMgr::updateFrame(IGFrame frame)
     if(frame.isPeriodic())
     {
         QMutexLocker mutex(m_PeriodicFrames->getMutex());
+        quint32 period = m_PeriodicFrames->value(frame.getUuid()).getPeriod();
         m_PeriodicFrames->insert(frame.getUuid(), frame);
-        emit frameUpdated(frame.getUuid());
+        emit frameUpdated(frame.getUuid(), period);
     }
     else
     {
@@ -121,7 +122,8 @@ void CANBusMgr::deleteFrame(QString uuid)
 
 void CANBusMgr::startMeasurement()
 {
-    m_thread->start();
+    if(!m_thread->isRunning())
+        m_thread->start();
 }
 
 void CANBusMgr::stopMeasurement()

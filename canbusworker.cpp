@@ -53,18 +53,20 @@ void CANBusWorker::process() { // Process. Start processing data.
 
 void CANBusWorker::stopMeasurement()
 {
-    m_isRunning = false;
-    QHashIterator<qint32, QTimer*> i(m_TimerList);
-    while (i.hasNext()) {
-        i.next();
-        QTimer * timer = i.value();
-        timer->stop();
-        delete timer;
+    if(m_isRunning){
+        m_isRunning = false;
+        QHashIterator<qint32, QTimer*> i(m_TimerList);
+        while (i.hasNext()) {
+            i.next();
+            QTimer * timer = i.value();
+            timer->stop();
+            delete timer;
+        }
+
+        m_TimerList.clear();
+
+        emit finished();
     }
-
-    m_TimerList.clear();
-
-    emit finished();
 }
 
 void CANBusWorker::timeoutExpired()
@@ -89,7 +91,7 @@ void CANBusWorker::timeoutExpired()
     qDebug()<<debugPrint;
 }
 
-void CANBusWorker::frameUpdated(QString uuid)
+void CANBusWorker::frameUpdated(QString uuid, quint32 old_period)
 {
     QTimer * timer = nullptr;
 
@@ -100,6 +102,28 @@ void CANBusWorker::frameUpdated(QString uuid)
         {
             IGFrame frame = m_PeriodicFrames->value(uuid);
             quint32 period = frame.getPeriod();
+
+            if(old_period != period)
+            {
+                if(m_FramesList.contains(old_period))
+                {
+                    QList<QString> * list = m_FramesList.value(old_period);
+                    if(list)
+                    {
+                        list->removeOne(uuid);
+                        if(list->empty())
+                        {
+                            delete list;
+                            m_FramesList.remove(old_period);
+                            QTimer * timer = m_TimerList.value(old_period);
+                            timer->stop();
+                            delete timer;
+                            m_TimerList.remove(old_period);
+                        }
+                    }
+                }
+            }
+
             if(period == 0)
                 return;
 
@@ -127,7 +151,7 @@ void CANBusWorker::frameUpdated(QString uuid)
     }
 }
 
-void CANBusWorker::frameDeleted(QString uuid, qint32 period)
+void CANBusWorker::frameDeleted(QString uuid, quint32 period)
 {
     QList<QString> * list = m_FramesList.value(period);
     if(!list)

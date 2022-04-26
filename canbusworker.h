@@ -23,8 +23,8 @@ public slots:
     void process();
     void stopMeasurement();
     void timeoutExpired();
-    void frameUpdated(QString uuid);
-    void frameDeleted(QString uuid, qint32 period);
+    void frameUpdated(QString uuid, quint32 old_period);
+    void frameDeleted(QString uuid, quint32 period);
     bool isRunning();
 
 signals:

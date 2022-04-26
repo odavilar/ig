@@ -40,8 +40,8 @@ public:
 
 signals:
     void stopMeasurementThread();
-    void frameUpdated(QString uuid);
-    void frameDeleted(QString uuid, qint32 period);
+    void frameUpdated(QString uuid, quint32 period);
+    void frameDeleted(QString uuid, quint32 period);
 
 public slots:
     void updateFrame(IGFrame frame);
