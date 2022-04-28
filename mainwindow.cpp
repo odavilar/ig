@@ -25,18 +25,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     m_connectDialog = new ConnectDialog;
 
-    m_connectMenuAction = new QAction(tr("&Connect"), this);
-    m_connectMenuAction->setStatusTip(tr("Connect device"));
-
-    ui->menubar->addAction(m_connectMenuAction);
-
-    m_startMenuAction = new QAction(tr("Start"), this);
-    m_startMenuAction->setStatusTip(tr("Start measurement"));
-    ui->menubar->addAction(m_startMenuAction);
-
-    m_stopMenuAction = new QAction(tr("Stop"), this);
-    m_stopMenuAction->setStatusTip(tr("Stop measurement"));
-    ui->menubar->addAction(m_stopMenuAction);
+    createMenu();
 
     initConnections();
 }
@@ -52,6 +41,47 @@ MainWindow::~MainWindow()
     delete m_startMenuAction;
     delete m_stopMenuAction;
     delete ui;
+}
+
+void MainWindow::createMenu()
+{
+
+
+    m_openConfigAction = new QAction(tr("&Open"), this);
+    m_openConfigAction->setStatusTip(tr("Open configuration"));
+    m_saveConfigAction = new QAction(tr("&Save"), this);
+    m_saveConfigAction->setStatusTip(tr("Save configuration"));
+    m_exitAction = new QAction(tr("&Exit"), this);
+    m_exitAction->setStatusTip(tr("Exit"));
+
+    m_fileMenu = menuBar()->addMenu(tr("&File"));
+    m_fileMenu->addAction(m_openConfigAction);
+    m_fileMenu->addAction(m_saveConfigAction);
+    m_fileMenu->addSeparator();
+    m_fileMenu->addAction(m_exitAction);
+
+    ui->menubar->addMenu(m_fileMenu);
+
+    m_connectMenuAction = new QAction(tr("&Connect"), this);
+    m_connectMenuAction->setStatusTip(tr("Connect device"));
+
+    m_disconnectMenuAction = new QAction(tr("&Disconnect"), this);
+    m_disconnectMenuAction->setStatusTip(tr("Disconnect device"));
+
+    m_startMenuAction = new QAction(tr("Start"), this);
+    m_startMenuAction->setStatusTip(tr("Start measurement"));
+
+    m_stopMenuAction = new QAction(tr("Stop"), this);
+    m_stopMenuAction->setStatusTip(tr("Stop measurement"));
+
+    m_deviceMenu = menuBar()->addMenu(tr("&Device"));
+    m_deviceMenu->addAction(m_connectMenuAction);
+    m_deviceMenu->addAction(m_disconnectMenuAction);
+    m_deviceMenu->addSeparator();
+    m_deviceMenu->addAction(m_startMenuAction);
+    m_deviceMenu->addAction(m_stopMenuAction);
+
+    ui->menubar->addMenu(m_deviceMenu);
 }
 
 void MainWindow::initConnections()

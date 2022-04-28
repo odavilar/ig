@@ -28,10 +28,19 @@ public:
 
 private:
     Ui::MainWindow *ui;
-    ConnectDialog *m_connectDialog = nullptr;
+
+    QMenu *m_fileMenu = nullptr;
+    QMenu *m_deviceMenu = nullptr;
+
+    QAction * m_openConfigAction = nullptr;
+    QAction * m_saveConfigAction = nullptr;
+    QAction * m_exitAction = nullptr;
     QAction * m_connectMenuAction = nullptr;
+    QAction * m_disconnectMenuAction = nullptr;
     QAction * m_startMenuAction = nullptr;
     QAction * m_stopMenuAction = nullptr;
+
+    ConnectDialog *m_connectDialog = nullptr;
     IGTable * m_igTable = nullptr;
 
     Ui::MainWindow *m_ui = nullptr;
@@ -42,6 +51,7 @@ private:
     CANBusMgr * m_canmgr = nullptr;
 
     void initConnections();
-
+    void createMenu();
+    void createToolBar();
 };
 #endif // MAINWINDOW_H
