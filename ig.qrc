@@ -1,9 +1,16 @@
 <RCC>
     <qresource prefix="/icons">
-        <file alias="application-exit">icons/application-exit.png</file>
-        <file alias="clear">icons/clear.png</file>
-        <file alias="connect">icons/connect.png</file>
-        <file alias="delete">icons/delete.png</file>
-        <file alias="disconnect">icons/disconnect.png</file>
+        <file alias="application-exit1">icons/application-exit.png</file>
+        <file alias="clear1">icons/clear.png</file>
+        <file alias="connect1">icons/connect.png</file>
+        <file alias="delete1">icons/delete.png</file>
+        <file alias="disconnect1">icons/disconnect.png</file>
+        <file alias="delete">icons/outline_delete_black_24dp.png</file>
+        <file alias="open">icons/outline_file_open_black_24dp.png</file>
+        <file alias="disconnect">icons/outline_flash_off_black_24dp.png</file>
+        <file alias="connect">icons/outline_flash_on_black_24dp.png</file>
+        <file alias="save">icons/outline_save_black_24dp.png</file>
+        <file alias="start">icons/outline_start_black_24dp.png</file>
+        <file alias="stop">icons/outline_stop_black_24dp.png</file>
     </qresource>
 </RCC>

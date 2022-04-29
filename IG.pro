@@ -13,6 +13,7 @@ INCLUDEPATH += serialbus/
 SOURCES += \
     canbusmgr.cpp \
     canbusworker.cpp \
+    config.cpp \
     deletemsgbutton.cpp \
     igframe.cpp \
     ighash.cpp \
@@ -25,6 +26,7 @@ SOURCES += \
 HEADERS += \
     canbusmgr.h \
     canbusworker.h \
+    config.h \
     deletemsgbutton.h \
     igframe.h \
     ighash.h \

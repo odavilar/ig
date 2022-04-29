@@ -85,6 +85,8 @@ void CANBusWorker::timeoutExpired()
         {
             IGFrame frame = m_PeriodicFrames->value(uuid);
             debugPrint = debugPrint + " : " + QString::number(frame.frameId(), 16);
+            if(m_canDevice)
+                m_canDevice->writeFrame(frame);
         }
     }
 
@@ -174,3 +176,10 @@ bool CANBusWorker::isRunning()
 {
     return m_isRunning;
 }
+
+bool CANBusWorker::setDevice(QCanBusDevice * device)
+{
+    m_canDevice = device;
+    return true;
+}
+

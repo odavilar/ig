@@ -4,6 +4,7 @@
 #include <QMainWindow>
 #include <QCanBusDevice>
 #include <QLabel>
+#include <QToolBar>
 #include "igframe.h"
 #include "canbusmgr.h"
 #include "ighash.h"
@@ -31,6 +32,7 @@ private:
 
     QMenu *m_fileMenu = nullptr;
     QMenu *m_deviceMenu = nullptr;
+    QToolBar *m_toolBar = nullptr;
 
     QAction * m_openConfigAction = nullptr;
     QAction * m_saveConfigAction = nullptr;
@@ -50,8 +52,14 @@ private:
     QTimer *m_busStatusTimer = nullptr;
     CANBusMgr * m_canmgr = nullptr;
 
+    QString m_curFile;
+
     void initConnections();
     void createMenu();
     void createToolBar();
+    bool save();
+    bool saveAs();
+    bool saveFile(QString file);
+    void open();
 };
 #endif // MAINWINDOW_H

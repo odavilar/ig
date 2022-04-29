@@ -5,6 +5,7 @@
 #include <QTimer>
 #include <QDebug>
 #include <QMutex>
+#include <QCanBusDevice>
 
 #include "igframe.h"
 #include "ighash.h"
@@ -26,12 +27,14 @@ public slots:
     void frameUpdated(QString uuid, quint32 old_period);
     void frameDeleted(QString uuid, quint32 period);
     bool isRunning();
+    bool setDevice(QCanBusDevice * device);
 
 signals:
     void finished();
     void error(QString err);
 
 private:
+    QCanBusDevice * m_canDevice;
     QSharedPointer<IGHash> m_PeriodicFrames;
     QHash<period, QTimer*> m_TimerList;
     QHash<period, QList<QString>*> m_FramesList;
